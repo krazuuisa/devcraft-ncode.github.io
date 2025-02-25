@@ -29,7 +29,7 @@ form.addEventListener('submit', async (event) => {
 
   try {
     // URL API untuk validasi nomor telepon
-    const url = `http://apilayer.net/api/validate?access_key=${apiKey}&number=${phoneNumber}`;
+    const url = `http://apilayer.net/api/validate?access_key=${apiKey}&number=${phoneNumber}&country_code=&format=1`;
 
     // Panggilan API menggunakan fetch
     const response = await fetch(url);
