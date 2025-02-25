@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>IP Geolocation Tool</title>
+</head>
+<body>
+    <div class="container">
+        <h1>IP Geolocation</h1>
+        <input type="text" id="ipAddress" placeholder="Masukkan IP (kosongkan untuk IP publik)" />
+        <button onclick="getGeolocation()">Cari Lokasi</button>
+        <div class="result" id="result">
+            <h3>Informasi Lokasi:</h3>
+            <p><strong>IP Address:</strong> <span id="ip"></span></p>
+            <p><strong>Kota:</strong> <span id="city"></span></p>
+            <p><strong>Negara:</strong> <span id="country"></span></p>
+            <p><strong>Organisasi:</strong> <span id="org"></span></p>
+            <p><strong>Lokasi:</strong> <span id="location"></span></p>
+        </div>
+    </div>
+
+    <script>
+        function getGeolocation() {
+            const ipAddress = document.getElementById('ipAddress').value || 'ipinfo.io';  // Menggunakan IP publik jika kosong
+            const url = `https://ipinfo.io/${ipAddress}/json`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('ip').innerText = data.ip || 'Tidak ditemukan';
+                    document.getElementById('city').innerText = data.city || 'Tidak ditemukan';
+                    document.getElementById('country').innerText = data.country || 'Tidak ditemukan';
+                    document.getElementById('org').innerText = data.org || 'Tidak ditemukan';
+                    document.getElementById('location').innerText = data.loc || 'Tidak ditemukan';
+                    document.getElementById('result').style.display = 'block';
+                })
+                .catch(error => {
+                    alert("Terjadi kesalahan dalam mengambil data.");
+                    console.error(error);
+                });
+        }
+    </script>
+    <script src="app.py"></script>
+</body>
+</html>
