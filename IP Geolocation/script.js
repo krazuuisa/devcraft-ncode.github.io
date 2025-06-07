@@ -1,47 +1,45 @@
 function getGeolocation() {
   const ip = document.getElementById('ipAddress').value.trim();
-  let url = 'https://ip-api.com/json/';
+  let url = 'https://ipwho.is/';
   if (ip) {
     url += ip;
   }
-  // Use HTTPS endpoint directly to avoid mixed content error
   fetch(url)
     .then(response => response.json())
     .then(data => {
-      document.getElementById('ip').innerText = data.query || '-';
-      // Gabungkan city dan district jika ada (contoh: JAKARTA, BARU ANCOL)
+      if (!data.success) {
+        document.getElementById('ip').innerText = '-';
+        document.getElementById('city').innerText = '-';
+        document.getElementById('country').innerText = '-';
+        document.getElementById('org').innerText = '-';
+        document.getElementById('location').innerText = '-';
+        document.getElementById('asn').innerText = '-';
+        document.getElementById('isp').innerText = '-';
+        document.getElementById('rdns').innerText = '-';
+        document.getElementById('flag').innerHTML = '';
+        document.getElementById('map').style.display = 'none';
+        return;
+      }
+      document.getElementById('ip').innerText = data.ip || '-';
       let cityText = data.city || '-';
-      if (data.district && data.district !== data.city) {
-        cityText = `${data.city}`;
-        document.getElementById('city').innerText = cityText;
-        document.getElementById('city').innerText += `, ${data.district}`;
-      } else {
-        document.getElementById('city').innerText = cityText;
-      }
+      document.getElementById('city').innerText = cityText;
       document.getElementById('country').innerText = data.country || '-';
-      // Info akurasi lokasi
-      if (data.status === 'success' && (!data.city || data.city === '-' || cityText.toLowerCase().includes('jakarta') || (data.district && data.district.toLowerCase().includes('ancol')))) {
-        document.getElementById('city').innerText += ' (Lokasi IP publik bisa tidak akurat)';
-      }
-      document.getElementById('org').innerText = data.org || data.as || '-';
-      document.getElementById('location').innerText = (data.lat && data.lon) ? `${data.lat}, ${data.lon}` : '-';
-      document.getElementById('asn').innerText = data.as || '-';
-      document.getElementById('isp').innerText = data.isp || '-';
-      document.getElementById('rdns').innerText = '-'; // ip-api.com free tier does not provide reverse DNS
-      // Flag
-       if (data.countryCode && data.countryCode.toLowerCase() !== 'id') {
-        document.getElementById('flag').innerHTML = `<img class="flag" src='https://flagcdn.com/28x20/${data.countryCode.toLowerCase()}.png' alt='${data.country}'>`;
+      document.getElementById('org').innerText = data.connection && data.connection.org ? data.connection.org : '-';
+      document.getElementById('location').innerText = (data.latitude && data.longitude) ? `${data.latitude}, ${data.longitude}` : '-';
+      document.getElementById('asn').innerText = data.connection && data.connection.asn ? data.connection.asn : '-';
+      document.getElementById('isp').innerText = data.connection && data.connection.isp ? data.connection.isp : '-';
+      document.getElementById('rdns').innerText = data.connection && data.connection.domain ? data.connection.domain : '-';
+      if (data.country_code && data.country_code.toLowerCase() !== 'id') {
+        document.getElementById('flag').innerHTML = `<img class="flag" src='https://flagcdn.com/28x20/${data.country_code.toLowerCase()}.png' alt='${data.country}'>`;
       } else {
         document.getElementById('flag').innerHTML = '';
       }
-      // Map
-      if (data.lat && data.lon && window.L) {
-        showMap(data.lat, data.lon);
+      if (data.latitude && data.longitude && window.L) {
+        showMap(data.latitude, data.longitude);
       } else {
         document.getElementById('map').style.display = 'none';
       }
     })
-    // Hilangkan alert error, cukup log di console
     .catch(error => {
       console.error(error);
     });
