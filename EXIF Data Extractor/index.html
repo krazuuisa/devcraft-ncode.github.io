@@ -5,15 +5,299 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EXIF Data Extractor</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background: #000 url('https://nathanprinsley-files.prinsh.com/data-1/images/NathanPrinsley-hacked_gif.gif') no-repeat center center fixed;
+            background-size: cover;
+            color: #39ff14;
+            font-family: 'Orbitron', 'Roboto', monospace, Arial, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        #particles-js {
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0; left: 0;
+            z-index: 1;
+        }
+        .container {
+            background: rgba(0,0,0,0.7);
+            border-radius: 12px;
+            box-shadow: 0 0 24px #222;
+            max-width: 600px;
+            margin: 60px auto 0 auto;
+            padding: 32px 28px 24px 28px;
+            position: relative;
+            z-index: 2;
+        }
+        h1 {
+            font-family: 'Wallpoet', 'Orbitron', monospace;
+            font-size: 2em;
+            letter-spacing: 2px;
+            text-align: center;
+            margin-bottom: 28px;
+            color: #39ff14;
+            text-shadow: 0 0 25px rgba(254,254,255,.25);
+        }
+        #imageUpload {
+            background: #181818;
+            color: #39ff14;
+            border: 1px solid #39ff14;
+            border-radius: 5px;
+            padding: 8px 12px;
+            font-size: 1em;
+            outline: none;
+            margin-bottom: 18px;
+            width: 100%;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 18px;
+            margin-top: 10px;
+        }
+        .btn-group button {
+            background: #222;
+            color: #39ff14;
+            border: 1px solid #39ff14;
+            border-radius: 5px;
+            padding: 7px 16px;
+            font-family: 'Orbitron', monospace;
+            font-size: 1em;
+            transition: background 0.2s, color 0.2s;
+            cursor: pointer;
+        }
+        .btn-group button:hover {
+            background: #39ff14;
+            color: #181818;
+        }
+        .exif-data {
+            background: #181818;
+            color: #39ff14;
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 1em;
+            margin-top: 10px;
+            min-height: 60px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            box-shadow: 0 0 8px #222;
+        }
+        #preview {
+            display: block;
+            margin: 0 auto 16px auto;
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 0 8px #222;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 16px 4vw;
+            }
+            .btn-group {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        window.onload = function() {
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+                    "color": { "value": "#cccccc" },
+                    "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000000" }, "polygon": { "nb_sides": 5 } },
+                    "opacity": { "value": 0.5, "random": false },
+                    "size": { "value": 5, "random": true },
+                    "line_linked": { "enable": true, "distance": 150, "color": "#cccccc", "opacity": 0.4, "width": 1 },
+                    "move": { "enable": true, "speed": 6, "direction": "none", "random": false, "straight": false, "out_mode": "out" }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": { "enable": true, "mode": "repulse" },
+                        "onclick": { "enable": true, "mode": "push" },
+                        "resize": true
+                    },
+                    "modes": {
+                        "grab": { "distance": 400, "line_linked": { "opacity": 1 } },
+                        "bubble": { "distance": 400, "size": 40, "duration": 2, "opacity": 8, "speed": 3 },
+                        "repulse": { "distance": 200 },
+                        "push": { "particles_nb": 4 },
+                        "remove": { "particles_nb": 2 }
+                    }
+                },
+                "retina_detect": true
+            });
+        }
+    </script>
 </head>
 <body>
+    <div id="particles-js"></div>
     <div class="container">
         <h1>EXIF Data Extractor</h1>
         <input type="file" id="imageUpload" accept="image/*" />
-        <div id="exifData" class="exif-data"></div>
+        <div style="display:flex;align-items:flex-start;gap:18px;">
+            <img id="preview" style="display:block;max-width:120px;max-height:120px;border-radius:8px;box-shadow:0 0 8px #222;margin:0;" />
+            <div style="flex:1;min-width:0;">
+                <pre id="exifData" class="exif-data" style="white-space:pre-wrap;">No image loaded. Please select an image to view EXIF data.</pre>
+            </div>
+        </div>
+        <div class="btn-group">
+            <button id="copyBtn" type="button">Copy EXIF</button>
+            <button id="downloadBtn" type="button">Download TXT</button>
+            <button id="clearBtn" type="button">Clear</button>
+        </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/exif-js@2.3.0/exif.min.js"></script>
-    <script src="script.js"></script>
+    <script>
+        const imageUpload = document.getElementById('imageUpload');
+        const exifDataDiv = document.getElementById('exifData');
+        const preview = document.getElementById('preview');
+        const downloadInfo = document.getElementById('downloadInfo');
+        let lastEXIF = 'No image loaded. Please select an image to view EXIF data.';
+
+        preview.style.display = 'block';
+        preview.src = '';
+        exifDataDiv.textContent = lastEXIF;
+
+        function formatEXIF(all) {
+            let output = '';
+            let gpsInfo = '';
+            let fieldNum = 1;
+            for (let tag in all) {
+                let val = all[tag];
+                if (val === undefined || val === null || val === '') continue;
+
+                let type = typeof val;
+                let detail = '';
+
+                if (type === 'object') {
+                    if (tag === 'thumbnail') {
+                        val = '[thumbnail data]';
+                        type = 'binary';
+                    } else if (Array.isArray(val)) {
+                        detail = ` (Array, length: ${val.length})`;
+                        val = '[ ' + val.map(v => typeof v === 'object' ? JSON.stringify(v, null, 2) : v).join(', ') + ' ]';
+                    } else {
+                        detail = ' (Object)';
+                        val = JSON.stringify(val, null, 2)
+                            .replace(/^{\n/, '') 
+                            .replace(/\n}$/, '');
+                    }
+                }
+
+                // Format field name: Capitalize and add spacing
+                let tagLabel = tag.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase()).replace(/_/g, ' ').trim();
+
+                // Add field number for clarity
+                output += `${fieldNum}. ${tagLabel}\n   ├─ Type   : ${type}${detail}\n   └─ Value  : ${val}\n\n`;
+                fieldNum++;
+                
+                // Tangkap info GPS
+                if (tag === 'GPSLatitude' && all.GPSLongitude) {
+                    // Konversi ke desimal
+                    const latArr = all.GPSLatitude;
+                    const lonArr = all.GPSLongitude;
+                    const latRef = all.GPSLatitudeRef || 'N';
+                    const lonRef = all.GPSLongitudeRef || 'E';
+                    const latVal = (latArr[0] + latArr[1]/60 + latArr[2]/3600) * (latRef === 'S' ? -1 : 1);
+                    const lonVal = (lonArr[0] + lonArr[1]/60 + lonArr[2]/3600) * (lonRef === 'W' ? -1 : 1);
+                    gpsInfo =
+                        `\n[GPS Location]\n` +
+                        `   ├─ Latitude : ${latVal} (${latRef})\n` +
+                        `   ├─ Longitude: ${lonVal} (${lonRef})\n` +
+                        `   └─ Google Maps: https://maps.google.com/?q=${latVal},${lonVal}\n`;
+                }
+            }
+            if (gpsInfo) output += gpsInfo;
+            if (output.trim() === '') output = 'No EXIF data found.';
+            return output;
+        }
+
+        imageUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) {
+                preview.src = '';
+                exifDataDiv.textContent = 'No image loaded. Please select an image to view EXIF data.';
+                lastEXIF = exifDataDiv.textContent;
+                return;
+            }
+            // Preview
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                preview.src = ev.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+
+            // EXIF
+            EXIF.getData(file, function() {
+                const all = EXIF.getAllTags(this);
+                let output = formatEXIF(all);
+                exifDataDiv.textContent = output;
+                lastEXIF = output;
+
+                // Highlight GPS
+                if (all.GPSLatitude && all.GPSLongitude) {
+                    const lat = all.GPSLatitude;
+                    const lon = all.GPSLongitude;
+                    const latRef = all.GPSLatitudeRef || 'N';
+                    const lonRef = all.GPSLongitudeRef || 'E';
+                    const latVal = (lat[0] + lat[1]/60 + lat[2]/3600) * (latRef === 'S' ? -1 : 1);
+                    const lonVal = (lon[0] + lon[1]/60 + lon[2]/3600) * (lonRef === 'W' ? -1 : 1);
+                    exifDataDiv.innerHTML += `<br><a href="https://maps.google.com/?q=${latVal},${lonVal}" target="_blank" style="color:#39ff14;text-decoration:underline;">View GPS on Google Maps</a>`;
+                }
+            });
+        });
+
+        document.getElementById('copyBtn').onclick = function() {
+            if (!lastEXIF) return;
+            navigator.clipboard.writeText(lastEXIF);
+        };
+        document.getElementById('downloadBtn').onclick = function() {
+            if (!lastEXIF) return;
+            const blob = new Blob([lastEXIF], {type: "text/plain"});
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "exif_data.txt";
+            link.click();
+
+            // Notifikasi download selesai
+            showNotif("EXIF data berhasil di-download sebagai exif_data.txt");
+        };
+
+        // Notifikasi sederhana
+        function showNotif(msg) {
+            let notif = document.createElement('div');
+            notif.textContent = msg;
+            notif.style.position = 'fixed';
+            notif.style.bottom = '30px';
+            notif.style.left = '50%';
+            notif.style.transform = 'translateX(-50%)';
+            notif.style.background = '#181818';
+            notif.style.color = '#39ff14';
+            notif.style.padding = '12px 28px';
+            notif.style.borderRadius = '8px';
+            notif.style.boxShadow = '0 0 12px #222';
+            notif.style.fontFamily = 'Orbitron, monospace';
+            notif.style.fontSize = '1em';
+            notif.style.zIndex = 9999;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 2500);
+        }
+
+        document.getElementById('clearBtn').onclick = function() {
+            exifDataDiv.textContent = 'No image loaded. Please select an image to view EXIF data.';
+            preview.src = '';
+            imageUpload.value = '';
+            lastEXIF = exifDataDiv.textContent;
+            document.getElementById('downloadInfo').style.display = 'none';
+        };
+    </script>
 </body>
 </html>
