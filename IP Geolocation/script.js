@@ -4,7 +4,8 @@ function getGeolocation() {
   if (ip) {
     url += ip;
   }
-  fetch(url.replace('https://','http://')) // ip-api.com endpoint only supports http for free tier
+  // Use HTTPS endpoint directly to avoid mixed content error
+  fetch(url)
     .then(response => response.json())
     .then(data => {
       document.getElementById('ip').innerText = data.query || '-';
