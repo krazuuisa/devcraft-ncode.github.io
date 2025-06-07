@@ -222,17 +222,26 @@
     <script src="script.js"></script>
     <script>
 function showNotif(msg) {
-    const notif = document.getElementById('notif');
-    notif.innerText = msg;
-    notif.style.display = 'block';
-    notif.style.opacity = '1';
+    let notif = document.createElement('div');
+    notif.textContent = msg;
+    notif.style.position = 'fixed';
+    notif.style.bottom = '30px';
+    notif.style.left = '50%';
+    notif.style.transform = 'translateX(-50%)';
+    notif.style.background = '#181818';
+    notif.style.color = '#39ff14';
+    notif.style.padding = '12px 28px';
+    notif.style.borderRadius = '8px';
+    notif.style.boxShadow = '0 0 12px #222';
+    notif.style.fontFamily = 'Orbitron, monospace';
+    notif.style.fontSize = '1em';
+    notif.style.zIndex = 9999;
+    notif.style.opacity = '0.95';
+    document.body.appendChild(notif);
     setTimeout(() => {
         notif.style.transition = 'opacity 0.5s';
         notif.style.opacity = '0';
-        setTimeout(() => {
-            notif.style.display = 'none';
-            notif.style.transition = '';
-        }, 500);
+        setTimeout(() => notif.remove(), 500);
     }, 1800);
 }
 
@@ -276,7 +285,7 @@ ASN: ${data.asn}
 ISP: ${data.isp}
 Reverse DNS: ${data.rdns}`;
     navigator.clipboard.writeText(text).then(() => {
-        showNotif('Hasil berhasil disalin!');
+        showNotif('Hasil berhasil disalin ke clipboard!');
     }, () => {
         showNotif('Gagal menyalin hasil.');
     });
@@ -300,7 +309,7 @@ Reverse DNS: ${data.rdns}`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    showNotif('Berhasil download TXT!');
+    showNotif('Data berhasil di-download sebagai ip-geolocation.txt');
 }
 
 function exportCSV() {
@@ -315,7 +324,7 @@ function exportCSV() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    showNotif('Berhasil ekspor CSV!');
+    showNotif('Data berhasil di-export sebagai ip-geolocation.csv');
 }
 </script>
 </body>
