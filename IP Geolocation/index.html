@@ -151,6 +151,7 @@
             }
         }
     </style>
+    <audio src="https://nathanprinsley-files.prinsh.com/data-1/mp3/sub-urban_cradles.mp3" loop autoplay></audio>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
     <script>
       window.onload = function() {
@@ -195,6 +196,7 @@
             <button onclick="copyResult()">Copy</button>
             <button onclick="downloadResult()">Download TXT</button>
             <button onclick="exportCSV()">Export CSV</button>
+            <button onclick="clearResult()">Clear</button> <!-- Tombol Clear ditambahkan -->
         </div>
         <div class="row">
             <div class="col-md-7 col-xs-12">
@@ -217,5 +219,20 @@
         </div>
     </div>
     <script src="script.js"></script>
+    <script>
+function clearResult() {
+    document.getElementById('ipAddress').value = '';
+    document.getElementById('ip').innerText = '-';
+    document.getElementById('city').innerText = '-';
+    document.getElementById('country').innerText = '-';
+    document.getElementById('org').innerText = '-';
+    document.getElementById('location').innerText = '-';
+    document.getElementById('asn').innerText = '-';
+    document.getElementById('isp').innerText = '-';
+    document.getElementById('rdns').innerText = '-';
+    document.getElementById('flag').innerHTML = '';
+    document.getElementById('map').style.display = 'none';
+}
+</script>
 </body>
 </html>
