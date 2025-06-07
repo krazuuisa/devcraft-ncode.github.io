@@ -234,5 +234,71 @@ function clearResult() {
     document.getElementById('map').style.display = 'none';
 }
 </script>
+<script>
+function getResultData() {
+    return {
+        ip: document.getElementById('ip').innerText,
+        city: document.getElementById('city').innerText,
+        country: document.getElementById('country').innerText,
+        org: document.getElementById('org').innerText,
+        location: document.getElementById('location').innerText,
+        asn: document.getElementById('asn').innerText,
+        isp: document.getElementById('isp').innerText,
+        rdns: document.getElementById('rdns').innerText
+    };
+}
+
+function copyResult() {
+    const data = getResultData();
+    const text = 
+`IP Address: ${data.ip}
+Kota: ${data.city}
+Negara: ${data.country}
+Organisasi: ${data.org}
+Lokasi: ${data.location}
+ASN: ${data.asn}
+ISP: ${data.isp}
+Reverse DNS: ${data.rdns}`;
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Hasil berhasil disalin!');
+    }, () => {
+        alert('Gagal menyalin hasil.');
+    });
+}
+
+function downloadResult() {
+    const data = getResultData();
+    const text = 
+`IP Address: ${data.ip}
+Kota: ${data.city}
+Negara: ${data.country}
+Organisasi: ${data.org}
+Lokasi: ${data.location}
+ASN: ${data.asn}
+ISP: ${data.isp}
+Reverse DNS: ${data.rdns}`;
+    const blob = new Blob([text], {type: 'text/plain'});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'ip-geolocation.txt';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function exportCSV() {
+    const data = getResultData();
+    const csv = 
+`IP Address,Kota,Negara,Organisasi,Lokasi,ASN,ISP,Reverse DNS
+"${data.ip}","${data.city}","${data.country}","${data.org}","${data.location}","${data.asn}","${data.isp}","${data.rdns}"`;
+    const blob = new Blob([csv], {type: 'text/csv'});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'ip-geolocation.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+</script>
 </body>
 </html>
