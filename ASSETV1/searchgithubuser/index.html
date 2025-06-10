@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta & Font Import -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta property="og:title" content="SEARCH GITHUB USER PROFIL">
+    <meta property="og:description" content="BY NCODE"/>
+    <meta content="" name="Abstract">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Orbitron:700|Wallpoet|Iceberg&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: #000 url('https://nathanprinsley-files.prinsh.com/data-1/images/NathanPrinsley-hacked_gif.gif') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Orbitron', 'Wallpoet', 'Iceberg', 'Courier New', monospace;
+            overflow-x: hidden;
+        }
+        #particles-js {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0; left: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .container, .results {
+            position: relative;
+            z-index: 2;
+        }
+        .container {
+            background: rgba(0,0,0,0.65);
+            border: 1.5px solid #39ff14;
+            border-radius: 16px;
+            box-shadow: 0 0 18px #39ff14a0;
+            padding: 7vw 4vw 5vw 4vw;
+            margin: 10vw auto 0 auto;
+            max-width: 99vw;
+            width: 99vw;
+            backdrop-filter: blur(2px);
+        }
+        .results {
+            background: rgba(0,0,0,0.35);
+            border: 1px solid #39ff14;
+            border-radius: 12px;
+            box-shadow: 0 0 10px #39ff1480;
+            margin: 6vw auto 0 auto;
+            max-width: 99vw;
+            width: 99vw;
+            padding: 5vw 3vw;
+            font-size: 15px;
+            color: #39ff14;
+            backdrop-filter: blur(1.5px);
+            word-break: break-word;
+        }
+        h1 {
+            font-family: 'Wallpoet', 'Orbitron', monospace;
+            font-size: 1.3em;
+            color: #39ff14;
+            text-shadow: 0 0 12px #39ff14, 0 0 2px #fff;
+            letter-spacing: 0.10em;
+            margin-bottom: 18px;
+            animation: blinker 1.2s infinite alternate;
+            text-align: center;
+        }
+        @keyframes blinker {
+            0% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        input {
+            background: rgba(0,0,0,0.7);
+            color: #39ff14;
+            border: 1.5px dashed #39ff14;
+            font-family: 'Iceberg', monospace;
+            padding: 12px;
+            font-size: 1.1em;
+            width: 100%;
+            border-radius: 8px;
+            outline: none;
+            margin-bottom: 14px;
+            transition: box-shadow 0.2s;
+            box-shadow: 0 0 8px #39ff1460;
+        }
+        input:focus {
+            box-shadow: 0 0 16px #39ff14;
+        }
+        button {
+            background: rgba(0,0,0,0.8);
+            color: #39ff14;
+            border: 1.5px solid #39ff14;
+            font-family: 'Orbitron', monospace;
+            padding: 12px 0;
+            font-size: 1.1em;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 0 8px #39ff1460;
+            transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+        button:hover {
+            background: #39ff14;
+            color: #000;
+            box-shadow: 0 0 18px #39ff14;
+        }
+        .loading {
+            font-size: 18px;
+            color: #39ff14;
+            font-family: 'Orbitron', monospace;
+            animation: blinker 1s infinite;
+        }
+        .results table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 18px;
+            background: rgba(0,0,0,0.7);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px #39ff14a0;
+        }
+        .results th, .results td {
+            border: 1px solid #39ff14;
+            padding: 10px 8px;
+            text-align: left;
+            font-family: 'Iceberg', monospace;
+            word-break: break-word;
+        }
+        .results th {
+            background: rgba(0,0,0,0.8);
+            color: #39ff14;
+            font-family: 'Orbitron', monospace;
+            text-shadow: 0 0 8px #39ff14;
+        }
+        .results td {
+            background: rgba(0,0,0,0.5);
+            color: #39ff14;
+        }
+        @media (max-width: 600px) {
+            .container, .results {
+                max-width: 96vw;
+                width: 96vw;
+                padding: 4vw 2vw 4vw 2vw;
+                margin: 4vw auto 0 auto;
+            }
+            h1 {
+                font-size: 1.2em;
+            }
+            input {
+                font-size: 1.1em;
+                padding: 12px;
+            }
+            button {
+                font-size: 1.1em;
+                padding: 12px 0;
+            }
+            .results th, .results td {
+                padding: 8px 4px;
+                font-size: 15px;
+            }
+            .results table {
+                font-size: 14px;
+            }
+            .results img {
+                width: 70px !important;
+                height: 70px !important;
+            }
+        }
+        /* Tambahan agar input dan button tidak terlalu lebar di Android */
+        input, button {
+            max-width: 100vw;
+        }
+        /* Responsive image in results */
+        .results img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <!-- Particles.js CDN ditambahkan agar partikel muncul -->
+    <div id="particles-js"></div>
+    <script>
+    particlesJS('particles-js', {
+      "particles": {
+        "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+        "color": { "value": "#b0b0b0" }, // warna abu-abu
+        "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000" } },
+        "opacity": { "value": 0.5, "random": false },
+        "size": { "value": 4, "random": true },
+        "line_linked": { "enable": true, "distance": 150, "color": "#b0b0b0", "opacity": 0.4, "width": 1 }, // warna abu-abu
+        "move": { "enable": true, "speed": 4, "direction": "none", "random": false, "straight": false, "out_mode": "out" }
+      },
+      "interactivity": {
+        "detect_on": "canvas",
+        "events": {
+          "onhover": { "enable": true, "mode": "repulse" },
+          "onclick": { "enable": true, "mode": "push" },
+          "resize": true
+        },
+        "modes": {
+          "grab": { "distance": 400, "line_linked": { "opacity": 1 } },
+          "bubble": { "distance": 400, "size": 40, "duration": 2, "opacity": 8, "speed": 3 },
+          "repulse": { "distance": 200 },
+          "push": { "particles_nb": 4 },
+          "remove": { "particles_nb": 2 }
+        }
+      },
+      "retina_detect": true
+    });
+    </script>
+</head>
+<body>
+
+    <div class="container">
+        <h1 class="blink_me">[ SEARCH GITHUB USER ]</h1>
+        <input type="text" id="username" placeholder="Enter GitHub Username">
+        <button onclick="searchUser()">Search</button>
+    </div>
+
+    <div class="results" id="results"></div>
+
+    <script>
+        // Fungsi untuk mencari pengguna GitHub berdasarkan username
+        async function searchUser() {
+            const username = document.getElementById('username').value;  // Ambil nilai username
+            const resultsDiv = document.getElementById('results');  // Div untuk menampilkan hasil pencarian
+
+            // Jika username kosong, beri pesan untuk mengisi kolom
+            if (!username) {
+                resultsDiv.innerHTML = 'Please enter a username.';
+                return;
+            }
+
+            // Reset hasil sebelumnya
+            resultsDiv.innerHTML = 'Loading...';
+
+            try {
+                // Kirim permintaan fetch ke API GitHub
+                const response = await fetch(`https://api.github.com/users/${username}`);
+                const data = await response.json();  // Ambil data dalam format JSON
+
+                // Jika tidak ditemukan, tampilkan pesan error
+                if (data.message === "Not Found") {
+                    resultsDiv.innerHTML = 'User not found on GitHub.';
+                } else {
+                    // Tampilkan hasil data pengguna GitHub
+                    resultsDiv.innerHTML = `
+                        <h2>GitHub Profile Information:</h2>
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 20px;">
+                            <img src="${data.avatar_url}" alt="Avatar" style="width: 100px; height: 100px; border-radius: 50%; border: 2px solid #0f0; box-shadow: 0 0 10px #0f0;">
+                            <h3 style="margin: 0;">${data.name || 'N/A'}</h3>
+                        </div>
+                        <table>
+                            <tr>
+                                <th>Field</th>
+                                <th>Value</th>
+                            </tr>
+                            <tr>
+                                <td><strong>Bio</strong></td>
+                                <td>${data.bio || 'N/A'}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Location</strong></td>
+                                <td>${data.location || 'N/A'}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Public Repositories</strong></td>
+                                <td>${data.public_repos}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Followers</strong></td>
+                                <td>${data.followers}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Following</strong></td>
+                                <td>${data.following}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Profile URL</strong></td>
+                                <td><a href="${data.html_url}" target="_blank">View Profile</a></td>
+                            </tr>
+                        </table>
+                    `;
+                }
+            } catch (error) {
+                // Jika ada error pada permintaan, tampilkan pesan error
+                resultsDiv.innerHTML = 'Error fetching data. Please try again later.';
+            }
+        }
+    </script>
+
+</body>
+</html>
