@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Meta & Font Import -->
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta property="og:title" content="SUSPICIUS STRING Highlighter">
+  <meta property="og:description" content="BY NCODE"/>
+  <meta content="" name="Abstract">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Orbitron:700|Wallpoet|Iceberg&display=swap" rel="stylesheet">
+  <style type="text/css">@font-face { font-family: 'Iceberg'; font-style: normal; font-weight: 400; src: local('Iceberg'), local('Iceberg-Regular'), url(https://fonts.gstatic.com/s/iceberg/v7/8QIJdijAiM7o-qnZiI8EqprnEO0.woff2) format('woff2'); }
+  @font-face { font-family: 'Wallpoet'; font-style: normal; font-weight: 400; src: local('Wallpoet'), url(https://fonts.gstatic.com/s/wallpoet/v11/f0X10em2_8RnXVVdUObp58Tt868H.woff2) format('woff2');}
+  </style>
+  <script src="js/jquery.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <!-- Particles.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+
+  <style>
+  body, html {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #000 url('https://nathanprinsley-files.prinsh.com/data-1/images/NathanPrinsley-hacked_gif.gif') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Orbitron', 'Wallpoet', 'Iceberg', 'Courier New', monospace;
+      overflow-x: hidden;
+  }
+  #particles-js {
+      width: 100vw;
+      height: 100vh;
+      position: fixed;
+      top: 0; left: 0;
+      z-index: 1;
+      pointer-events: none;
+  }
+  .container, .result-box {
+      position: relative;
+      z-index: 2;
+  }
+  .container {
+      background: transparent !important;
+      border: 1.5px solid #39ff14;
+      border-radius: 16px;
+      box-shadow: 0 0 30px #39ff14a0;
+      padding: 32px 24px 24px 24px;
+      margin: 60px auto 0 auto;
+      max-width: 520px;
+      backdrop-filter: blur(3px);
+  }
+  .result-box {
+      background: transparent !important;
+      border: 1px solid #39ff14;
+      border-radius: 12px;
+      box-shadow: 0 0 20px #39ff1480;
+      margin: 30px auto 0 auto;
+      max-width: 700px;
+      padding: 24px 18px;
+      font-size: 15px;
+      color: #39ff14;
+      backdrop-filter: blur(2px);
+      min-height: 60px;
+      font-family: 'Iceberg', monospace;
+  }
+  h1 {
+      font-family: 'Wallpoet', 'Orbitron', monospace;
+      font-size: 2.2em;
+      color: #39ff14;
+      text-shadow: 0 0 18px #39ff14, 0 0 2px #fff;
+      letter-spacing: 0.12em;
+      margin-bottom: 18px;
+      animation: blinker 1.2s infinite alternate;
+  }
+  @keyframes blinker {
+      0% { opacity: 1; }
+      100% { opacity: 0.7; }
+  }
+  textarea {
+      background: rgba(0,0,0,0.7);
+      color: #39ff14;
+      border: 1.5px dashed #39ff14;
+      font-family: 'Iceberg', monospace;
+      padding: 14px;
+      font-size: 1.1em;
+      width: 100%;
+      min-height: 120px;
+      border-radius: 8px;
+      outline: none;
+      transition: box-shadow 0.2s;
+      box-shadow: 0 0 8px #39ff1460;
+      margin-bottom: 18px;
+      resize: vertical;
+  }
+  textarea:focus {
+      box-shadow: 0 0 16px #39ff14;
+  }
+  .btn-group {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 10px;
+  }
+  button {
+      background: transparent !important;
+      color: #39ff14;
+      border: 1.5px solid #39ff14;
+      font-family: 'Orbitron', monospace;
+      padding: 12px 28px;
+      font-size: 1.1em;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 8px #39ff1460;
+      transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+  }
+  button:hover {
+      background: #39ff14;
+      color: #000;
+      box-shadow: 0 0 18px #39ff14;
+  }
+  #count {
+      color: #39ff14;
+      font-family: 'Orbitron', monospace;
+      font-size: 1.1em;
+      margin: 10px 0 0 0;
+      text-align: center;
+      text-shadow: 0 0 8px #39ff14;
+  }
+  ::-webkit-scrollbar {
+      width: 8px;
+      background: #111;
+  }
+  ::-webkit-scrollbar-thumb {
+      background: #39ff14;
+      border-radius: 8px;
+  }
+  /* Responsive for Android/mobile */
+  @media (max-width: 600px) {
+    html, body {
+      padding: 0 !important;
+      margin: 0 !important;
+      width: 100vw !important;
+      max-width: 100vw !important;
+      overflow-x: hidden !important;
+    }
+    .container {
+      max-width: 100vw !important;
+      width: 100vw !important;
+      padding: 3vw 1vw 2vw 1vw !important;
+      margin: 1vw auto 0 auto !important;
+      box-shadow: none !important;
+      border-width: 1px !important;
+      border-radius: 8px !important;
+    }
+    .result-box {
+      max-width: 100vw !important;
+      width: 100vw !important;
+      padding: 2vw 1vw !important;
+      font-size: 12px !important;
+      margin: 1vw auto 0 auto !important;
+      box-shadow: none !important;
+      border-width: 1px !important;
+      border-radius: 6px !important;
+      min-height: 30px !important;
+    }
+    h1 {
+      font-size: 0.95em !important;
+      margin-bottom: 6px !important;
+      text-align: center !important;
+    }
+    textarea {
+      font-size: 0.9em !important;
+      padding: 6px !important;
+      min-height: 40px !important;
+      margin-bottom: 8px !important;
+      border-radius: 6px !important;
+    }
+    .btn-group {
+      flex-direction: column !important;
+      gap: 4px !important;
+      width: 100% !important;
+    }
+    button {
+      font-size: 0.9em !important;
+      padding: 6px 0 !important;
+      width: 100% !important;
+      margin: 0 !important;
+      border-radius: 6px !important;
+    }
+    #count {
+      font-size: 0.9em !important;
+      margin: 4px 0 0 0 !important;
+    }
+    #particles-js {
+      width: 100vw !important;
+      height: 100vh !important;
+      min-width: 100vw !important;
+      min-height: 100vh !important;
+    }
+  }
+  </style>
+  <!-- Audio BGM -->
+  <audio src="https://nathanprinsley-files.prinsh.com/data-1/mp3/sub-urban_cradles.mp3" loop autoplay></audio>
+  <!-- Particles.js container -->
+  <div id="particles-js"></div>
+  <script>
+  particlesJS('particles-js', {
+    "particles": {
+      "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+      "color": { "value": "#bbb" }, // partikel abu-abu
+      "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000" } },
+      "opacity": { "value": 0.5, "random": false },
+      "size": { "value": 4, "random": true },
+      "line_linked": { "enable": true, "distance": 150, "color": "#bbb", "opacity": 0.4, "width": 1 },
+      "move": { "enable": true, "speed": 4, "direction": "none", "random": false, "straight": false, "out_mode": "out" }
+    },
+    "interactivity": {
+      "detect_on": "canvas",
+      "events": {
+        "onhover": { "enable": true, "mode": "repulse" },
+        "onclick": { "enable": true, "mode": "push" },
+        "resize": true
+      },
+      "modes": {
+        "grab": { "distance": 400, "line_linked": { "opacity": 1 } },
+        "bubble": { "distance": 400, "size": 40, "duration": 2, "opacity": 8, "speed": 3 },
+        "repulse": { "distance": 200 },
+        "push": { "particles_nb": 4 },
+        "remove": { "particles_nb": 2 }
+      }
+    },
+    "retina_detect": true
+  });
+  </script>
+  <title>Suspicious String Highlighter</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Suspicious String Highlighter</h1>
+    <textarea id="inputText" placeholder="Paste suspicious code, strings, or logs here..."></textarea>
+    <div class="btn-group">
+      <button id="highlightBtn">Highlight Suspicious Strings</button>
+      <button id="clearBtn">🧹 Clear</button>
+      <button id="downloadTxtBtn">📄 Export .txt</button>
+    </div>
+    <p id="count"></p>
+    <div id="result" class="result-box"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
