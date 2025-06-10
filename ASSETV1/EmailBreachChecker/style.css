@@ -1,0 +1,34 @@
+body {
+  background: #0f0f0f;
+  color: #00ff00;
+  font-family: monospace;
+  text-align: center;
+  padding: 40px;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+}
+
+input, button {
+  padding: 10px;
+  margin: 10px;
+  background: black;
+  color: #00ff00;
+  border: 1px solid #00ff00;
+}
+
+button:hover {
+  background: #00ff00;
+  color: black;
+  cursor: pointer;
+}
+
+#results {
+  margin-top: 20px;
+  white-space: pre-wrap;
+  text-align: left;
+  background: #111;
+  padding: 15px;
+}
