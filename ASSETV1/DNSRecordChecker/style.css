@@ -1,0 +1,47 @@
+body {
+  background-color: black;
+  color: #00ff00;
+  font-family: 'Courier New', monospace;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 24px;
+  text-shadow: 0 0 10px #00ff00;
+}
+
+input, select, button {
+  background-color: #111;
+  color: #00ff00;
+  border: 1px solid #00ff00;
+  padding: 10px;
+  margin: 10px 0;
+  width: 80%;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #00ff00;
+  color: black;
+}
+
+pre {
+  background-color: #111;
+  color: #00ff00;
+  border: 1px dashed #00ff00;
+  padding: 10px;
+  text-align: left;
+  white-space: pre-wrap;
+  margin-top: 20px;
+}
