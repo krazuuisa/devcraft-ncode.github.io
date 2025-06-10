@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta property="og:title" content="NCODE Crypt0r">
+    <meta property="og:description" content="BY NCODE"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>NCODE Crypt0r</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- Cyberpunk fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Orbitron&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'Iceberg';
+            font-style: normal;
+            font-weight: 400;
+            src: local('Iceberg'), local('Iceberg-Regular'), url(https://fonts.gstatic.com/s/iceberg/v7/8QIJdijAiM7o-qnZiI8EqprnEO0.woff2) format('woff2');
+        }
+        @font-face {
+            font-family: 'Wallpoet';
+            font-style: normal;
+            font-weight: 400;
+            src: local('Wallpoet'), url(https://fonts.gstatic.com/s/wallpoet/v11/f0X10em2_8RnXVVdUObp58Tt868H.woff2) format('woff2');
+        }
+        html, body {
+            height: 100%;
+            background: black url('https://nathanprinsley-files.prinsh.com/data-1/images/NathanPrinsley-hacked_gif.gif') no-repeat center center fixed;
+            background-size: cover;
+            color: #39ff14;
+            font-family: 'Orbitron', 'Wallpoet', 'Iceberg', 'Share Tech Mono', monospace, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        #particles-js {
+            width: 100vw;
+            height: 100vh;
+            background-size: cover;
+            background-position: 50% 50%;
+            position: fixed;
+            top: 0px;
+            left: 0px;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .container {
+            background: rgba(0,0,0,0.78);
+            border-radius: 14px;
+            box-shadow: 0 0 24px #222;
+            max-width: 99vw;
+            width: 99vw;
+            margin: 10vw auto 0 auto;
+            padding: 6vw 3vw 5vw 3vw;
+            position: relative;
+            z-index: 2;
+            min-height: 60vh;
+        }
+        h1 {
+            font-family: 'Wallpoet', 'Orbitron', monospace;
+            font-size: 1.3em;
+            letter-spacing: 2px;
+            text-align: center;
+            margin-bottom: 18px;
+            color: #39ff14;
+            text-shadow: 0 0 25px rgba(254,254,255,.25);
+        }
+        textarea, input[type="text"], select {
+            background: #181818;
+            color: #39ff14;
+            border: 1px solid #39ff14;
+            border-radius: 5px;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+            width: 100%;
+            outline: none;
+            font-family: 'Share Tech Mono', 'Orbitron', monospace;
+        }
+        textarea#output {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .btn-group, button {
+            background: #222;
+            color: #39ff14;
+            border: 1px solid #39ff14;
+            border-radius: 5px;
+            padding: 10px 18px;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.05em;
+            transition: background 0.2s, color 0.2s;
+            cursor: pointer;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            min-width: 120px;
+        }
+        button:hover {
+            background: #39ff14;
+            color: #181818;
+        }
+        #history {
+            margin-top:18px;
+            background:#181818cc;
+            color:#39ff14;
+            border-radius:8px;
+            padding:10px;
+            max-height:120px;
+            overflow-y:auto;
+            font-size:.95em;
+            font-family:monospace;
+        }
+        .cyber-label {
+            color: #39ff14;
+            font-family: 'Share Tech Mono', monospace;
+            margin-right: 8px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 5vw 2vw 4vw 2vw;
+                margin-top: 4vw;
+                min-height: 70vh;
+            }
+            h1 {
+                font-size: 1.1em;
+            }
+            .btn-group, button {
+                min-width: 90px;
+                font-size: .9em;
+            }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+      window.onload = function() {
+        particlesJS('particles-js', {
+          "particles": {
+            "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+            "color": { "value": "#cccccc" },
+            "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000000" }, "polygon": { "nb_sides": 5 } },
+            "opacity": { "value": 0.5, "random": false },
+            "size": { "value": 5, "random": true },
+            "line_linked": { "enable": true, "distance": 150, "color": "#cccccc", "opacity": 0.4, "width": 1 },
+            "move": { "enable": true, "speed": 6, "direction": "none", "random": false, "straight": false, "out_mode": "out" }
+          },
+          "interactivity": {
+            "detect_on": "canvas",
+            "events": {
+              "onhover": { "enable": true, "mode": "repulse" },
+              "onclick": { "enable": true, "mode": "push" },
+              "resize": true
+            },
+            "modes": {
+              "grab": { "distance": 400, "line_linked": { "opacity": 1 } },
+              "bubble": { "distance": 400, "size": 40, "duration": 2, "opacity": 8, "speed": 3 },
+              "repulse": { "distance": 200 },
+              "push": { "particles_nb": 4 },
+              "remove": { "particles_nb": 2 }
+            }
+          },
+          "retina_detect": true
+        });
+      }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.js"></script>
+</head>
+<body>
+    <div id="particles-js"></div>
+    <div class="container">
+        <h1>NCODE Crypt0r</h1>
+        <textarea id="message" placeholder="Masukkan pesan di sini..."></textarea>
+        <input type="text" id="key" placeholder="Masukkan kunci rahasia">
+        <div style="margin:10px 0;display:flex;gap:10px;flex-wrap:wrap;">
+            <label class="cyber-label">Algoritma:</label>
+            <select id="algo" style="width:auto;">
+                <option value="AES">AES</option>
+                <option value="DES">DES</option>
+                <option value="RC4">RC4</option>
+                <option value="Rabbit">Rabbit</option>
+            </select>
+            <button id="showKeyBtn" type="button">Show Key</button>
+            <button id="clearBtn" type="button">Clear All</button>
+            <button id="copyBtn" type="button">Copy</button>
+            <button id="downloadBtn" type="button">Download TXT</button>
+            <label style="display:flex;align-items:center;gap:4px;">
+                <input type="checkbox" id="autoCase" style="margin:0;"> Uppercase
+            </label>
+            <label style="display:flex;align-items:center;gap:4px;">
+                <input type="checkbox" id="autoDecrypt" style="margin:0;"> Auto Decrypt
+            </label>
+        </div>
+        <button onclick="encryptMessage()">Enkripsi</button>
+        <button onclick="decryptMessage()">Dekripsi</button>
+        <textarea id="output" readonly placeholder="Hasil akan ditampilkan di sini..."></textarea>
+        <div id="history"></div>
+    </div>
+    <script>
+    // Show/Hide Key
+    const keyInput = document.getElementById('key');
+    document.getElementById('showKeyBtn').onclick = function() {
+        keyInput.type = keyInput.type === 'password' ? 'text' : 'password';
+        this.textContent = keyInput.type === 'password' ? 'Show Key' : 'Hide Key';
+    };
+    keyInput.type = 'password';
+
+    // Copy to Clipboard
+    document.getElementById('copyBtn').onclick = function() {
+        const text = document.getElementById('output').value;
+        if (text) navigator.clipboard.writeText(text);
+    };
+
+    // Download as TXT
+    document.getElementById('downloadBtn').onclick = function() {
+        const text = document.getElementById('output').value;
+        if (!text) return;
+        const blob = new Blob([text], {type: "text/plain"});
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "ncode_cryptor.txt";
+        link.click();
+    };
+
+    // Clear All
+    document.getElementById('clearBtn').onclick = function() {
+        document.getElementById('message').value = '';
+        document.getElementById('key').value = '';
+        document.getElementById('output').value = '';
+    };
+
+    // Auto Uppercase
+    document.getElementById('autoCase').onchange = function() {
+        const out = document.getElementById('output');
+        if (this.checked) out.value = out.value.toUpperCase();
+        else out.value = out.value.toLowerCase();
+    };
+
+    // Auto Decrypt
+    document.getElementById('autoDecrypt').onchange = function() {
+        if (this.checked) {
+            document.getElementById('message').addEventListener('input', autoDecryptHandler);
+        } else {
+            document.getElementById('message').removeEventListener('input', autoDecryptHandler);
+        }
+    };
+    function autoDecryptHandler() {
+        decryptMessage();
+    }
+
+    // History
+    function addHistory(type, msg, out) {
+        let history = JSON.parse(localStorage.getItem('ncodeHistory') || '[]');
+        history.unshift({type, msg, out, time: new Date().toLocaleString()});
+        if (history.length > 10) history = history.slice(0,10);
+        localStorage.setItem('ncodeHistory', JSON.stringify(history));
+        renderHistory();
+    }
+    function renderHistory() {
+        let history = JSON.parse(localStorage.getItem('ncodeHistory') || '[]');
+        document.getElementById('history').innerHTML = history.map(h =>
+            `<div><b>[${h.type}]</b> ${h.time}<br>Msg: <code>${h.msg}</code><br>Out: <code>${h.out}</code></div>`
+        ).join('<hr style="border-color:#39ff14;">');
+    }
+    renderHistory();
+
+    // Algoritma
+    function getAlgo() {
+        return document.getElementById('algo').value;
+    }
+
+    // Encrypt
+    window.encryptMessage = function() {
+        const msg = document.getElementById('message').value;
+        const key = document.getElementById('key').value;
+        let out = '';
+        if (!msg || !key) return;
+        switch(getAlgo()) {
+            case 'AES': out = CryptoJS.AES.encrypt(msg, key).toString(); break;
+            case 'DES': out = CryptoJS.DES.encrypt(msg, key).toString(); break;
+            case 'RC4': out = CryptoJS.RC4.encrypt(msg, key).toString(); break;
+            case 'Rabbit': out = CryptoJS.Rabbit.encrypt(msg, key).toString(); break;
+        }
+        if (document.getElementById('autoCase').checked) out = out.toUpperCase();
+        document.getElementById('output').value = out;
+        addHistory('ENCRYPT', msg, out);
+    };
+
+    // Decrypt
+    window.decryptMessage = function() {
+        const msg = document.getElementById('message').value;
+        const key = document.getElementById('key').value;
+        let out = '';
+        if (!msg || !key) return;
+        try {
+            switch(getAlgo()) {
+                case 'AES': out = CryptoJS.AES.decrypt(msg, key).toString(CryptoJS.enc.Utf8); break;
+                case 'DES': out = CryptoJS.DES.decrypt(msg, key).toString(CryptoJS.enc.Utf8); break;
+                case 'RC4': out = CryptoJS.RC4.decrypt(msg, key).toString(CryptoJS.enc.Utf8); break;
+                case 'Rabbit': out = CryptoJS.Rabbit.decrypt(msg, key).toString(CryptoJS.enc.Utf8); break;
+            }
+            if (document.getElementById('autoCase').checked) out = out.toUpperCase();
+            document.getElementById('output').value = out;
+            addHistory('DECRYPT', msg, out);
+        } catch(e) {
+            document.getElementById('output').value = '[DECRYPT ERROR]';
+        }
+    };
+    </script>
+</body>
+</html>
