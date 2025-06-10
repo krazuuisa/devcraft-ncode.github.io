@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>ASCII Generator</title>
+  <!-- Cyberpunk fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Orbitron&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      background: black url('https://nathanprinsley-files.prinsh.com/data-1/images/NathanPrinsley-hacked_gif.gif') no-repeat center center fixed;
+      background-size: cover;
+      color: #39ff14;
+      font-family: 'Orbitron', 'Share Tech Mono', monospace, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    #particles-js {
+      width: 100vw;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .container {
+      background: rgba(0,0,0,0.78);
+      border-radius: 14px;
+      box-shadow: 0 0 24px #222;
+      max-width: 99vw;
+      width: 99vw;
+      margin: 10vw auto 0 auto;
+      padding: 6vw 3vw 5vw 3vw;
+      position: relative;
+      z-index: 2;
+      min-height: 60vh;
+    }
+    h1 {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.3em;
+      letter-spacing: 2px;
+      text-align: center;
+      margin-bottom: 18px;
+      color: #39ff14;
+      text-shadow: 0 0 25px rgba(254,254,255,.25);
+    }
+    label, input, button, select, textarea {
+      font-family: 'Share Tech Mono', 'Orbitron', monospace;
+      font-size: 1em;
+    }
+    input[type="file"] {
+      background: #181818;
+      color: #39ff14;
+      border: 1px solid #39ff14;
+      border-radius: 5px;
+      padding: 8px 12px;
+      margin-bottom: 10px;
+      width: 100%;
+      outline: none;
+    }
+    .btn-group, button {
+      background: #222;
+      color: #39ff14;
+      border: 1px solid #39ff14;
+      border-radius: 5px;
+      padding: 10px 18px;
+      font-family: 'Orbitron', monospace;
+      font-size: 1.05em;
+      transition: background 0.2s, color 0.2s;
+      cursor: pointer;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      min-width: 120px;
+    }
+    button:hover {
+      background: #39ff14;
+      color: #181818;
+    }
+    #asciiOutput {
+      width: 100%;
+      height: 320px;
+      background: #181818cc;
+      color: #39ff14;
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 1em;
+      margin-top: 10px;
+      min-height: 60px;
+      white-space: pre;
+      word-break: break-word;
+      box-shadow: 0 0 8px #222;
+      font-family: 'Share Tech Mono', 'Orbitron', monospace;
+      resize: vertical;
+    }
+    #preview {
+      display: block;
+      margin: 18px auto 10px auto;
+      max-width: 220px;
+      max-height: 220px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px #222;
+      background: #111;
+    }
+    .ascii-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .ascii-controls label {
+      margin-right: 6px;
+    }
+    @media (max-width: 700px) {
+      .container {
+        padding: 5vw 2vw 4vw 2vw;
+        margin-top: 4vw;
+        min-height: 70vh;
+      }
+      h1 {
+        font-size: 1.1em;
+      }
+      .btn-group, button {
+        min-width: 90px;
+        font-size: 0.95em;
+        padding: 8px 6px;
+      }
+      #asciiOutput {
+        font-size: 0.98em;
+        padding: 10px;
+        height: 180px;
+      }
+      .ascii-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+      #preview {
+        max-width: 100%;
+        max-height: 160px;
+      }
+    }
+    @media (max-width: 400px) {
+      .container {
+        padding: 3vw 1vw 2vw 1vw;
+        margin-top: 2vw;
+      }
+      h1 {
+        font-size: 1em;
+      }
+      .btn-group, button {
+        min-width: 70px;
+        font-size: 0.92em;
+        padding: 7px 2px;
+      }
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+  <script>
+    window.onload = function() {
+      particlesJS('particles-js', {
+        "particles": {
+          "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+          "color": { "value": "#cccccc" },
+          "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000000" }, "polygon": { "nb_sides": 5 } },
+          "opacity": { "value": 0.5, "random": false },
+          "size": { "value": 5, "random": true },
+          "line_linked": { "enable": true, "distance": 150, "color": "#cccccc", "opacity": 0.4, "width": 1 },
+          "move": { "enable": true, "speed": 6, "direction": "none", "random": false, "straight": false, "out_mode": "out" }
+        },
+        "interactivity": {
+          "detect_on": "canvas",
+          "events": {
+            "onhover": { "enable": true, "mode": "repulse" },
+            "onclick": { "enable": true, "mode": "push" },
+            "resize": true
+          },
+          "modes": {
+            "grab": { "distance": 400, "line_linked": { "opacity": 1 } },
+            "bubble": { "distance": 400, "size": 40, "duration": 2, "opacity": 8, "speed": 3 },
+            "repulse": { "distance": 200 },
+            "push": { "particles_nb": 4 },
+            "remove": { "particles_nb": 2 }
+          }
+        },
+        "retina_detect": true
+      });
+    }
+  </script>
+</head>
+<body>
+  <div id="particles-js"></div>
+  <div class="container">
+    <h1>ASCII Generator</h1>
+    <p>Upload gambar Anda untuk mengonversinya menjadi ASCII art!</p>
+    <div class="ascii-controls">
+      <label for="asciiChars">Karakter ASCII:</label>
+      <input type="text" id="asciiChars" value="@#%+=-:. " style="width:120px;">
+      <label for="asciiWidth">Lebar:</label>
+      <input type="number" id="asciiWidth" value="100" min="20" max="300" style="width:60px;">
+      <label for="asciiInvert">Invert:</label>
+      <input type="checkbox" id="asciiInvert">
+    </div>
+    <input type="file" id="imageInput" accept="image/*" style="margin-bottom:10px;">
+    <div style="margin-bottom:10px;">
+      <button id="generateBtn">Generate ASCII</button>
+      <button id="downloadBtn">Download ASCII</button>
+      <button id="copyBtn">Copy ASCII</button>
+    </div>
+    <img id="preview" src="" alt="Preview" style="display:none;">
+    <textarea id="asciiOutput" readonly></textarea>
+  </div>
+  <script src="script.js"></script>
+  <script>
+    // Drag & Drop support
+    const imageInput = document.getElementById('imageInput');
+    const container = document.querySelector('.container');
+    container.addEventListener('dragover', e => { e.preventDefault(); container.style.boxShadow = '0 0 32px #39ff14'; });
+    container.addEventListener('dragleave', e => { e.preventDefault(); container.style.boxShadow = '0 0 24px #222'; });
+    container.addEventListener('drop', e => {
+      e.preventDefault();
+      container.style.boxShadow = '0 0 24px #222';
+      if (e.dataTransfer.files.length) {
+        imageInput.files = e.dataTransfer.files;
+        showPreview();
+      }
+    });
+
+    // Preview image
+    imageInput.addEventListener('change', showPreview);
+    function showPreview() {
+      const file = imageInput.files[0];
+      const preview = document.getElementById('preview');
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        preview.src = '';
+        preview.style.display = 'none';
+      }
+    }
+
+    // ASCII generation logic
+    function generateASCII(callback) {
+      const file = imageInput.files[0];
+      if (!file) return;
+      const asciiChars = document.getElementById('asciiChars').value || "@#%+=-:. ";
+      const asciiWidth = parseInt(document.getElementById('asciiWidth').value) || 100;
+      const invert = document.getElementById('asciiInvert').checked;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const scale = asciiWidth / img.width;
+          canvas.width = asciiWidth;
+          canvas.height = Math.round(img.height * scale * 0.55); // 0.55: font aspect ratio
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+          let ascii = '';
+          for (let y = 0; y < canvas.height; y++) {
+            for (let x = 0; x < canvas.width; x++) {
+              const offset = (y * canvas.width + x) * 4;
+              const r = imgData[offset], g = imgData[offset+1], b = imgData[offset+2];
+              const avg = (r + g + b) / 3;
+              let idx = Math.floor((avg / 255) * (asciiChars.length - 1));
+              if (invert) idx = asciiChars.length - 1 - idx;
+              ascii += asciiChars[idx];
+            }
+            ascii += '\n';
+          }
+          callback(ascii);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Generate ASCII on button click
+    document.getElementById('generateBtn').onclick = function() {
+      generateASCII(ascii => {
+        document.getElementById('asciiOutput').value = ascii;
+      });
+    };
+
+    // Auto generate after upload
+    imageInput.addEventListener('change', () => {
+      showPreview();
+      generateASCII(ascii => {
+        document.getElementById('asciiOutput').value = ascii;
+      });
+    });
+
+    // Download ASCII
+    document.getElementById('downloadBtn').onclick = function() {
+      const text = document.getElementById('asciiOutput').value;
+      if (!text) return;
+      const blob = new Blob([text], {type: "text/plain"});
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "ascii_art.txt";
+      link.click();
+    };
+
+    // Copy ASCII
+    document.getElementById('copyBtn').onclick = function() {
+      const text = document.getElementById('asciiOutput').value;
+      if (text) navigator.clipboard.writeText(text);
+    };
+  </script>
+</body>
+</html>
