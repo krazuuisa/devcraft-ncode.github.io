@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta property="og:title" content="Email Permutation Generator">
+  <meta property="og:description" content="BY NCODE"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Email Permutation Generator</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <style type="text/css">
+    @font-face {
+      font-family: 'Iceberg';
+      font-style: normal;
+      font-weight: 400;
+      src: local('Iceberg'), local('Iceberg-Regular'), url(https://fonts.gstatic.com/s/iceberg/v7/8QIJdijAiM7o-qnZiI8EqprnEO0.woff2) format('woff2');
+    }
+    @font-face {
+      font-family: 'Wallpoet';
+      font-style: normal;
+      font-weight: 400;
+      src: local('Wallpoet'), url(https://fonts.gstatic.com/s/wallpoet/v11/f0X10em2_8RnXVVdUObp58Tt868H.woff2) format('woff2');
+    }
+    html, body {
+      height: 100%;
+      background: #101214 url('https://nathanprinsley-files.prinsh.com/data-1/images/NathanPrinsley-hacked_gif.gif') no-repeat center center fixed;
+      background-size: cover;
+      color: #39ff14;
+      font-family: 'Orbitron', 'Roboto', 'Iceberg', 'Wallpoet', monospace, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    #particles-js {
+      width: 100vw;
+      height: 100vh;
+      background: transparent;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .container {
+      background: rgba(0,0,0,0.78);
+      border-radius: 14px;
+      box-shadow: 0 0 24px #222;
+      max-width: 99vw;
+      width: 99vw;
+      margin: 10vw auto 0 auto;
+      padding: 6vw 3vw 5vw 3vw;
+      position: relative;
+      z-index: 2;
+      min-height: 60vh;
+    }
+    h1 {
+      font-family: 'Wallpoet', 'Orbitron', monospace;
+      font-size: 1.3em;
+      letter-spacing: 2px;
+      text-align: center;
+      margin-bottom: 18px;
+      color: #39ff14;
+      text-shadow: 0 0 25px rgba(254,254,255,.15);
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    input[type="text"] {
+      background: #181818;
+      color: #39ff14;
+      border: 1px solid #39ff14;
+      border-radius: 5px;
+      padding: 10px 14px;
+      font-size: 1.05em;
+      outline: none;
+      min-width: 0;
+      margin-bottom: 0;
+    }
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 18px;
+      margin-top: 10px;
+    }
+    button {
+      background: #39ff14;
+      color: #181818;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 18px;
+      font-family: 'Orbitron', monospace;
+      font-weight: bold;
+      font-size: 1.05em;
+      transition: background 0.2s;
+      cursor: pointer;
+      min-width: 120px;
+    }
+    button:hover {
+      background: #2ecc40;
+      color: #000;
+    }
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      background: #181818;
+      color: #39ff14;
+      border-radius: 8px;
+      border: 1px solid #39ff14;
+      padding: 12px;
+      font-size: 1em;
+      margin-top: 10px;
+      box-shadow: 0 0 8px #222;
+      resize: vertical;
+    }
+    .info {
+      color: #39ff14;
+      font-size: 0.98em;
+      margin-bottom: 8px;
+      text-align: right;
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 5vw 2vw 4vw 2vw;
+        margin-top: 4vw;
+        min-height: 70vh;
+      }
+      h1 {
+        font-size: 1.1em;
+      }
+      .btn-group button {
+        min-width: 90px;
+        font-size: 0.95em;
+        padding: 8px 6px;
+      }
+      input[type="text"], textarea {
+        font-size: 1em;
+        padding: 9px 10px;
+      }
+    }
+    @media (max-width: 400px) {
+      .container {
+        padding: 3vw 1vw 2vw 1vw;
+        margin-top: 2vw;
+      }
+      h1 {
+        font-size: 1em;
+      }
+      .btn-group button {
+        min-width: 70px;
+        font-size: 0.92em;
+        padding: 7px 2px;
+      }
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+  <script>
+    window.onload = function() {
+      particlesJS('particles-js', {
+        "particles": {
+          "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
+          "color": { "value": "#39ff14" },
+          "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000000" }, "polygon": { "nb_sides": 5 } },
+          "opacity": { "value": 0.4, "random": false },
+          "size": { "value": 3, "random": true },
+          "line_linked": { "enable": true, "distance": 120, "color": "#39ff14", "opacity": 0.25, "width": 1 },
+          "move": { "enable": true, "speed": 2.5, "direction": "none", "random": false, "straight": false, "out_mode": "out" }
+        },
+        "interactivity": {
+          "detect_on": "canvas",
+          "events": {
+            "onhover": { "enable": true, "mode": "repulse" },
+            "onclick": { "enable": true, "mode": "push" },
+            "resize": true
+          },
+          "modes": {
+            "grab": { "distance": 400, "line_linked": { "opacity": 1 } },
+            "bubble": { "distance": 400, "size": 40, "duration": 2, "opacity": 8, "speed": 3 },
+            "repulse": { "distance": 120 },
+            "push": { "particles_nb": 2 },
+            "remove": { "particles_nb": 1 }
+          }
+        },
+        "retina_detect": true
+      });
+      document.getElementById('first').focus();
+    };
+    // Enter untuk generate
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Enter') {
+        if(document.activeElement.tagName === 'INPUT') {
+          e.preventDefault();
+          generateEmails();
+        }
+      }
+    });
+    function generateEmails() {
+      const first = document.getElementById('first').value.trim().toLowerCase();
+      const last = document.getElementById('last').value.trim().toLowerCase();
+      const domain = document.getElementById('domain').value.trim().toLowerCase();
+      const middle = document.getElementById('middle').value.trim().toLowerCase();
+      if (!first || !last || !domain) {
+        document.getElementById('result').value = 'Please fill all required fields!';
+        document.getElementById('countInfo').textContent = '';
+        return;
+      }
+      let perms = [];
+      perms.push(`${first}@${domain}`);
+      perms.push(`${last}@${domain}`);
+      perms.push(`${first}.${last}@${domain}`);
+      perms.push(`${first}_${last}@${domain}`);
+      perms.push(`${first}${last}@${domain}`);
+      perms.push(`${first[0]}${last}@${domain}`);
+      perms.push(`${first}${last[0]}@${domain}`);
+      perms.push(`${first[0]}.${last}@${domain}`);
+      perms.push(`${first}.${last[0]}@${domain}`);
+      perms.push(`${last}.${first}@${domain}`);
+      perms.push(`${last}_${first}@${domain}`);
+      perms.push(`${last}${first}@${domain}`);
+      perms.push(`${last[0]}${first}@${domain}`);
+      perms.push(`${last}${first[0]}@${domain}`);
+      if (middle) {
+        perms.push(`${first}.${middle}.${last}@${domain}`);
+        perms.push(`${first}${middle[0]}${last}@${domain}`);
+        perms.push(`${first[0]}${middle[0]}${last[0]}@${domain}`);
+        perms.push(`${first}${middle}${last}@${domain}`);
+        perms.push(`${first}.${middle[0]}.${last}@${domain}`);
+      }
+      perms = [...new Set(perms)];
+      document.getElementById('result').value = perms.join('\n');
+      document.getElementById('countInfo').textContent = `Generated: ${perms.length} permutations`;
+      let history = JSON.parse(localStorage.getItem('emailPermHistory') || '[]');
+      history.unshift({first, middle, last, domain, count: perms.length, time: new Date().toLocaleString()});
+      history = history.slice(0, 10);
+      localStorage.setItem('emailPermHistory', JSON.stringify(history));
+    }
+    function copyResult() {
+      const txt = document.getElementById('result');
+      txt.select();
+      document.execCommand('copy');
+    }
+    function downloadResult() {
+      const text = document.getElementById('result').value;
+      const blob = new Blob([text], {type: "text/plain"});
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "email_permutations.txt";
+      link.click();
+    }
+    function clearAll() {
+      document.getElementById('first').value = '';
+      document.getElementById('last').value = '';
+      document.getElementById('domain').value = '';
+      document.getElementById('middle').value = '';
+      document.getElementById('result').value = '';
+      document.getElementById('countInfo').textContent = '';
+    }
+  </script>
+</head>
+<body>
+  <div id="particles-js"></div>
+  <div class="container">
+    <h1>Email Permutation Generator</h1>
+    <div class="input-group">
+      <input type="text" id="first" placeholder="First Name (e.g. John)">
+      <input type="text" id="last" placeholder="Last Name (e.g. Doe)">
+      <input type="text" id="domain" placeholder="Domain (e.g. gmail.com)">
+      <input type="text" id="middle" placeholder="Middle Name/Initial (optional)">
+    </div>
+    <div class="btn-group">
+      <button onclick="generateEmails()">Generate</button>
+      <button onclick="copyResult()">Copy</button>
+      <button onclick="downloadResult()">Download TXT</button>
+      <button onclick="clearAll()">Clear</button>
+    </div>
+    <div class="info" id="countInfo"></div>
+    <textarea id="result" placeholder="Generated emails will appear here..."></textarea>
+  </div>
+</body>
+</html>
