@@ -1,0 +1,96 @@
+/* Hacker theme: black background, green text */
+body {
+  background-color: #000;
+  color: #0f0;
+  font-family: 'Courier New', Courier, monospace;
+  margin: 0;
+  padding: 20px;
+  user-select: none;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 10px;
+  text-shadow: 0 0 5px #0f0;
+}
+
+#drop-zone {
+  border: 2px dashed #0f0;
+  padding: 40px;
+  margin-bottom: 20px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.3s;
+}
+
+#drop-zone.dragover {
+  background-color: #003300;
+}
+
+#drop-zone p {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+#results {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #0f0;
+  padding: 10px;
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+}
+
+.result-item {
+  margin-bottom: 10px;
+  border-bottom: 1px dotted #0f0;
+  padding-bottom: 6px;
+}
+
+.result-item .filename {
+  font-weight: bold;
+  text-shadow: 0 0 2px #0f0;
+}
+
+.mismatch {
+  color: #f00;
+  font-weight: bold;
+}
+
+.match {
+  color: #0f0;
+  font-weight: bold;
+}
+
+button {
+  background-color: #0f0;
+  border: none;
+  padding: 10px 20px;
+  font-family: 'Courier New', monospace;
+  cursor: pointer;
+  color: #000;
+  font-weight: bold;
+  text-transform: uppercase;
+  display: block;
+  margin: 10px auto 0;
+  transition: background-color 0.3s;
+}
+
+button:disabled {
+  background-color: #040;
+  cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+  background-color: #5f5;
+}

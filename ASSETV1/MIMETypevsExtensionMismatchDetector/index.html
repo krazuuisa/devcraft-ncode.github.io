@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MIME Type vs Extension Mismatch Detector - Hacker Style</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>MIME Type vs Extension Mismatch Detector</h1>
+    <p>Drag & Drop or click to select files. Check if MIME type matches file extension.</p>
+    <div id="drop-zone" tabindex="0">
+      <p>Drop files here or click to select</p>
+      <input type="file" id="file-input" multiple />
+    </div>
+    <div id="results"></div>
+    <button id="download-report" disabled>Download Report (CSV)</button>
+  </div>
+
+  <script src="style.js"></script>
+</body>
+</html>
