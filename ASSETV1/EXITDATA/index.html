@@ -1,303 +1,474 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EXIF Data Extractor</title>
-    <link rel="stylesheet" href="styles.css">
-    <style>
-        body {
-            background: #000 url('https://nathanprinsley-files.prinsh.com/data-1/images/NathanPrinsley-hacked_gif.gif') no-repeat center center fixed;
-            background-size: cover;
-            color: #39ff14;
-            font-family: 'Orbitron', 'Roboto', monospace, Arial, sans-serif;
-            min-height: 100vh;
-            margin: 0;
-            padding: 0;
-        }
-        #particles-js {
-            width: 100%;
-            height: 100%;
-            position: fixed;
-            top: 0; left: 0;
-            z-index: 1;
-        }
-        .container {
-            background: rgba(0,0,0,0.7);
-            border-radius: 12px;
-            box-shadow: 0 0 24px #222;
-            max-width: 600px;
-            margin: 60px auto 0 auto;
-            padding: 32px 28px 24px 28px;
-            position: relative;
-            z-index: 2;
-        }
-        h1 {
-            font-family: 'Wallpoet', 'Orbitron', monospace;
-            font-size: 2em;
-            letter-spacing: 2px;
-            text-align: center;
-            margin-bottom: 28px;
-            color: #39ff14;
-            text-shadow: 0 0 25px rgba(254,254,255,.25);
-        }
-        #imageUpload {
-            background: #181818;
-            color: #39ff14;
-            border: 1px solid #39ff14;
-            border-radius: 5px;
-            padding: 8px 12px;
-            font-size: 1em;
-            outline: none;
-            margin-bottom: 18px;
-            width: 100%;
-        }
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 18px;
-            margin-top: 10px;
-        }
-        .btn-group button {
-            background: #222;
-            color: #39ff14;
-            border: 1px solid #39ff14;
-            border-radius: 5px;
-            padding: 7px 16px;
-            font-family: 'Orbitron', monospace;
-            font-size: 1em;
-            transition: background 0.2s, color 0.2s;
-            cursor: pointer;
-        }
-        .btn-group button:hover {
-            background: #39ff14;
-            color: #181818;
-        }
-        .exif-data {
-            background: #181818;
-            color: #39ff14;
-            border-radius: 8px;
-            padding: 16px;
-            font-size: 1em;
-            margin-top: 10px;
-            min-height: 60px;
-            white-space: pre-wrap;
-            word-break: break-word;
-            box-shadow: 0 0 8px #222;
-        }
-        #preview {
-            display: block;
-            margin: 0 auto 16px auto;
-            max-width: 100%;
-            border-radius: 8px;
-            box-shadow: 0 0 8px #222;
-        }
-        @media (max-width: 600px) {
-            .container {
-                padding: 16px 4vw;
-            }
-            .btn-group {
-                flex-direction: column;
-                gap: 8px;
-            }
-        }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
-    <script>
-        window.onload = function() {
-            particlesJS('particles-js', {
-                "particles": {
-                    "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
-                    "color": { "value": "#cccccc" },
-                    "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000000" }, "polygon": { "nb_sides": 5 } },
-                    "opacity": { "value": 0.5, "random": false },
-                    "size": { "value": 5, "random": true },
-                    "line_linked": { "enable": true, "distance": 150, "color": "#cccccc", "opacity": 0.4, "width": 1 },
-                    "move": { "enable": true, "speed": 6, "direction": "none", "random": false, "straight": false, "out_mode": "out" }
-                },
-                "interactivity": {
-                    "detect_on": "canvas",
-                    "events": {
-                        "onhover": { "enable": true, "mode": "repulse" },
-                        "onclick": { "enable": true, "mode": "push" },
-                        "resize": true
-                    },
-                    "modes": {
-                        "grab": { "distance": 400, "line_linked": { "opacity": 1 } },
-                        "bubble": { "distance": 400, "size": 40, "duration": 2, "opacity": 8, "speed": 3 },
-                        "repulse": { "distance": 200 },
-                        "push": { "particles_nb": 4 },
-                        "remove": { "particles_nb": 2 }
-                    }
-                },
-                "retina_detect": true
-            });
-        }
-    </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EXITDATA</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Consolas", monospace;
+    }
+
+    body {
+      background: #05070a;
+      color: #00ff99;
+      overflow-x: hidden;
+    }
+
+    /* Animated Matrix BG */
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -2;
+      width: 100%;
+      height: 100%;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle, rgba(0,255,153,0.15), rgba(0,0,0,0.95));
+      z-index: -1;
+    }
+
+    header {
+      text-align: center;
+      padding: 30px 10px;
+      border-bottom: 1px solid rgba(0,255,153,0.2);
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      text-shadow: 0 0 12px rgba(0,255,153,0.8);
+      letter-spacing: 2px;
+    }
+
+    header p {
+      margin-top: 8px;
+      font-size: 0.95rem;
+      opacity: 0.8;
+    }
+
+    .container {
+      width: 95%;
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 20px;
+      border: 1px solid rgba(0,255,153,0.2);
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.65);
+      box-shadow: 0 0 25px rgba(0,255,153,0.12);
+    }
+
+    .upload-box {
+      padding: 25px;
+      border: 1px dashed rgba(0,255,153,0.4);
+      border-radius: 12px;
+      text-align: center;
+      transition: 0.3s;
+    }
+
+    .upload-box:hover {
+      border-color: #00ff99;
+      box-shadow: 0 0 15px rgba(0,255,153,0.4);
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .btn {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 12px 20px;
+      border: 1px solid rgba(0,255,153,0.6);
+      border-radius: 10px;
+      cursor: pointer;
+      background: rgba(0,255,153,0.08);
+      color: #00ff99;
+      font-size: 0.95rem;
+      transition: 0.25s;
+    }
+
+    .btn:hover {
+      background: rgba(0,255,153,0.2);
+      box-shadow: 0 0 12px rgba(0,255,153,0.6);
+    }
+
+    .progress {
+      margin-top: 20px;
+      height: 10px;
+      width: 100%;
+      background: rgba(0,255,153,0.08);
+      border-radius: 8px;
+      overflow: hidden;
+      display: none;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #00ff99;
+      transition: 0.3s;
+    }
+
+    .preview {
+      margin-top: 25px;
+      display: none;
+      text-align: center;
+    }
+
+    .preview img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 10px;
+      border: 1px solid rgba(0,255,153,0.25);
+      box-shadow: 0 0 18px rgba(0,255,153,0.15);
+    }
+
+    .result-box {
+      margin-top: 30px;
+      display: none;
+      padding: 20px;
+      border: 1px solid rgba(0,255,153,0.2);
+      border-radius: 12px;
+      background: rgba(0,0,0,0.6);
+      overflow-x: auto;
+    }
+
+    .result-box h2 {
+      font-size: 1.2rem;
+      margin-bottom: 12px;
+      text-shadow: 0 0 8px rgba(0,255,153,0.6);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    table td {
+      padding: 10px;
+      border-bottom: 1px solid rgba(0,255,153,0.15);
+      vertical-align: top;
+    }
+
+    table td:first-child {
+      width: 35%;
+      opacity: 0.85;
+    }
+
+    .tools {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      opacity: 0.6;
+      font-size: 0.8rem;
+    }
+
+    .warning {
+      margin-top: 15px;
+      padding: 10px;
+      border: 1px solid rgba(255,80,80,0.4);
+      border-radius: 10px;
+      background: rgba(255,80,80,0.08);
+      color: rgba(255,120,120,0.95);
+      display: none;
+    }
+
+    .success {
+      margin-top: 15px;
+      padding: 10px;
+      border: 1px solid rgba(0,255,153,0.4);
+      border-radius: 10px;
+      background: rgba(0,255,153,0.08);
+      display: none;
+      color: rgba(0,255,153,0.95);
+    }
+
+    a {
+      color: #00ff99;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
+
 <body>
-    <div id="particles-js"></div>
-    <div class="container">
-        <h1>EXIF Data Extractor</h1>
-        <input type="file" id="imageUpload" accept="image/*" />
-        <div style="display:flex;align-items:flex-start;gap:18px;">
-            <img id="preview" style="display:block;max-width:120px;max-height:120px;border-radius:8px;box-shadow:0 0 8px #222;margin:0;" />
-            <div style="flex:1;min-width:0;">
-                <pre id="exifData" class="exif-data" style="white-space:pre-wrap;">No image loaded. Please select an image to view EXIF data.</pre>
-            </div>
-        </div>
-        <div class="btn-group">
-            <button id="copyBtn" type="button">Copy EXIF</button>
-            <button id="downloadBtn" type="button">Download TXT</button>
-            <button id="clearBtn" type="button">Clear</button>
-        </div>
+  <canvas id="matrix"></canvas>
+  <div class="overlay"></div>
+
+  <header>
+    <h1>EXITDATA</h1>
+    <p>NCODE</p>
+  </header>
+
+  <div class="container">
+    <div class="upload-box">
+      <h2>[UPLOAD TARGET IMAGE]</h2>
+      <p style="opacity:0.8;margin-top:8px;">
+        Extract EXIF, GPS Coordinates, Device Data, Camera Settings, and more.
+      </p>
+
+      <label class="btn" for="fileInput">SELECT IMAGE</label>
+      <input type="file" id="fileInput" accept="image/*" />
+
+      <div class="progress" id="progress">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+
+      <div class="warning" id="warningBox"></div>
+      <div class="success" id="successBox"></div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/exif-js@2.3.0/exif.min.js"></script>
-    <script>
-        const imageUpload = document.getElementById('imageUpload');
-        const exifDataDiv = document.getElementById('exifData');
-        const preview = document.getElementById('preview');
-        const downloadInfo = document.getElementById('downloadInfo');
-        let lastEXIF = 'No image loaded. Please select an image to view EXIF data.';
 
-        preview.style.display = 'block';
-        preview.src = '';
-        exifDataDiv.textContent = lastEXIF;
+    <div class="preview" id="previewBox">
+      <h2 style="margin-bottom:15px;">[PREVIEW]</h2>
+      <img id="previewImage" src="" alt="Preview" />
+    </div>
 
-        function formatEXIF(all) {
-            let output = '';
-            let gpsInfo = '';
-            let fieldNum = 1;
-            for (let tag in all) {
-                let val = all[tag];
-                if (val === undefined || val === null || val === '') continue;
+    <div class="result-box" id="resultBox">
+      <h2>[EXTRACTED DATA]</h2>
+      <table id="exifTable"></table>
 
-                let type = typeof val;
-                let detail = '';
+      <div class="tools">
+        <button class="btn" onclick="copyResult()">COPY RESULT</button>
+        <button class="btn" onclick="downloadTXT()">DOWNLOAD TXT</button>
+        <button class="btn" onclick="downloadJSON()">DOWNLOAD JSON</button>
+        <button class="btn" onclick="resetAll()">RESET</button>
+      </div>
+    </div>
+  </div>
 
-                if (type === 'object') {
-                    if (tag === 'thumbnail') {
-                        val = '[thumbnail data]';
-                        type = 'binary';
-                    } else if (Array.isArray(val)) {
-                        detail = ` (Array, length: ${val.length})`;
-                        val = '[ ' + val.map(v => typeof v === 'object' ? JSON.stringify(v, null, 2) : v).join(', ') + ' ]';
-                    } else {
-                        detail = ' (Object)';
-                        val = JSON.stringify(val, null, 2)
-                            .replace(/^{\n/, '') 
-                            .replace(/\n}$/, '');
-                    }
-                }
+  <div class="footer">
+    EXITDATA v1.0 
+  </div>
 
-                // Format field name: Capitalize and add spacing
-                let tagLabel = tag.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase()).replace(/_/g, ' ').trim();
+  <!-- EXIF Library -->
+  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
 
-                // Add field number for clarity
-                output += `${fieldNum}. ${tagLabel}\n   ├─ Type   : ${type}${detail}\n   └─ Value  : ${val}\n\n`;
-                fieldNum++;
-                
-                // Tangkap info GPS
-                if (tag === 'GPSLatitude' && all.GPSLongitude) {
-                    // Konversi ke desimal
-                    const latArr = all.GPSLatitude;
-                    const lonArr = all.GPSLongitude;
-                    const latRef = all.GPSLatitudeRef || 'N';
-                    const lonRef = all.GPSLongitudeRef || 'E';
-                    const latVal = (latArr[0] + latArr[1]/60 + latArr[2]/3600) * (latRef === 'S' ? -1 : 1);
-                    const lonVal = (lonArr[0] + lonArr[1]/60 + lonArr[2]/3600) * (lonRef === 'W' ? -1 : 1);
-                    gpsInfo =
-                        `\n[GPS Location]\n` +
-                        `   ├─ Latitude : ${latVal} (${latRef})\n` +
-                        `   ├─ Longitude: ${lonVal} (${lonRef})\n` +
-                        `   └─ Google Maps: https://maps.google.com/?q=${latVal},${lonVal}\n`;
-                }
-            }
-            if (gpsInfo) output += gpsInfo;
-            if (output.trim() === '') output = 'No EXIF data found.';
-            return output;
+  <script>
+    let extractedData = {};
+
+    const fileInput = document.getElementById("fileInput");
+    const previewBox = document.getElementById("previewBox");
+    const previewImage = document.getElementById("previewImage");
+    const resultBox = document.getElementById("resultBox");
+    const exifTable = document.getElementById("exifTable");
+    const warningBox = document.getElementById("warningBox");
+    const successBox = document.getElementById("successBox");
+    const progress = document.getElementById("progress");
+    const progressBar = document.getElementById("progressBar");
+
+    fileInput.addEventListener("change", function () {
+      const file = this.files[0];
+      if (!file) return;
+
+      resetUI();
+      progress.style.display = "block";
+      progressBar.style.width = "10%";
+
+      // Preview image
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        previewImage.src = e.target.result;
+        previewBox.style.display = "block";
+        progressBar.style.width = "30%";
+
+        setTimeout(() => {
+          extractEXIF(previewImage);
+        }, 300);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function extractEXIF(img) {
+      EXIF.getData(img, function () {
+        progressBar.style.width = "60%";
+
+        const allTags = EXIF.getAllTags(this);
+
+        if (!allTags || Object.keys(allTags).length === 0) {
+          warningBox.style.display = "block";
+          warningBox.innerHTML =
+            "⚠ EXIF data not found. This image may have been stripped (WhatsApp/Instagram removes metadata).";
+          progressBar.style.width = "100%";
+          return;
         }
 
-        imageUpload.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) {
-                preview.src = '';
-                exifDataDiv.textContent = 'No image loaded. Please select an image to view EXIF data.';
-                lastEXIF = exifDataDiv.textContent;
-                return;
-            }
-            // Preview
-            const reader = new FileReader();
-            reader.onload = function(ev) {
-                preview.src = ev.target.result;
-                preview.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
+        extractedData = allTags;
 
-            // EXIF
-            EXIF.getData(file, function() {
-                const all = EXIF.getAllTags(this);
-                let output = formatEXIF(all);
-                exifDataDiv.textContent = output;
-                lastEXIF = output;
+        // GPS conversion if exists
+        if (allTags.GPSLatitude && allTags.GPSLongitude) {
+          const lat = convertDMSToDD(allTags.GPSLatitude, allTags.GPSLatitudeRef);
+          const lon = convertDMSToDD(allTags.GPSLongitude, allTags.GPSLongitudeRef);
 
-                // Highlight GPS
-                if (all.GPSLatitude && all.GPSLongitude) {
-                    const lat = all.GPSLatitude;
-                    const lon = all.GPSLongitude;
-                    const latRef = all.GPSLatitudeRef || 'N';
-                    const lonRef = all.GPSLongitudeRef || 'E';
-                    const latVal = (lat[0] + lat[1]/60 + lat[2]/3600) * (latRef === 'S' ? -1 : 1);
-                    const lonVal = (lon[0] + lon[1]/60 + lon[2]/3600) * (lonRef === 'W' ? -1 : 1);
-                    exifDataDiv.innerHTML += `<br><a href="https://maps.google.com/?q=${latVal},${lonVal}" target="_blank" style="color:#39ff14;text-decoration:underline;">View GPS on Google Maps</a>`;
-                }
-            });
-        });
-
-        document.getElementById('copyBtn').onclick = function() {
-            if (!lastEXIF) return;
-            navigator.clipboard.writeText(lastEXIF);
-        };
-        document.getElementById('downloadBtn').onclick = function() {
-            if (!lastEXIF) return;
-            const blob = new Blob([lastEXIF], {type: "text/plain"});
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "exif_data.txt";
-            link.click();
-
-            // Notifikasi download selesai
-            showNotif("EXIF data berhasil di-download sebagai exif_data.txt");
-        };
-
-        // Notifikasi sederhana
-        function showNotif(msg) {
-            let notif = document.createElement('div');
-            notif.textContent = msg;
-            notif.style.position = 'fixed';
-            notif.style.bottom = '30px';
-            notif.style.left = '50%';
-            notif.style.transform = 'translateX(-50%)';
-            notif.style.background = '#181818';
-            notif.style.color = '#39ff14';
-            notif.style.padding = '12px 28px';
-            notif.style.borderRadius = '8px';
-            notif.style.boxShadow = '0 0 12px #222';
-            notif.style.fontFamily = 'Orbitron, monospace';
-            notif.style.fontSize = '1em';
-            notif.style.zIndex = 9999;
-            document.body.appendChild(notif);
-            setTimeout(() => notif.remove(), 2500);
+          extractedData.GPSLatitudeDecimal = lat;
+          extractedData.GPSLongitudeDecimal = lon;
+          extractedData.GoogleMapsLink = `https://www.google.com/maps?q=${lat},${lon}`;
         }
 
-        document.getElementById('clearBtn').onclick = function() {
-            exifDataDiv.textContent = 'No image loaded. Please select an image to view EXIF data.';
-            preview.src = '';
-            imageUpload.value = '';
-            lastEXIF = exifDataDiv.textContent;
-            document.getElementById('downloadInfo').style.display = 'none';
-        };
-    </script>
+        progressBar.style.width = "100%";
+
+        successBox.style.display = "block";
+        successBox.innerHTML = "✔ EXIF extraction complete. Data loaded successfully.";
+
+        renderTable(extractedData);
+        resultBox.style.display = "block";
+      });
+    }
+
+    function renderTable(data) {
+      exifTable.innerHTML = "";
+
+      const sortedKeys = Object.keys(data).sort();
+
+      sortedKeys.forEach(key => {
+        let value = data[key];
+
+        if (typeof value === "object") {
+          value = JSON.stringify(value);
+        }
+
+        // if maps link
+        if (key === "GoogleMapsLink") {
+          value = `<a href="${data[key]}" target="_blank">OPEN LOCATION (GOOGLE MAPS)</a>`;
+        }
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td><b>${key}</b></td>
+          <td>${value}</td>
+        `;
+        exifTable.appendChild(row);
+      });
+    }
+
+    function convertDMSToDD(dms, ref) {
+      const degrees = dms[0].numerator / dms[0].denominator;
+      const minutes = dms[1].numerator / dms[1].denominator;
+      const seconds = dms[2].numerator / dms[2].denominator;
+
+      let dd = degrees + minutes / 60 + seconds / 3600;
+
+      if (ref === "S" || ref === "W") dd = dd * -1;
+
+      return dd.toFixed(6);
+    }
+
+    function copyResult() {
+      const text = formatResultText(extractedData);
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Copied to clipboard!");
+      });
+    }
+
+    function downloadTXT() {
+      const text = formatResultText(extractedData);
+      downloadFile(text, "EXITDATA_EXIF_RESULT.txt", "text/plain");
+    }
+
+    function downloadJSON() {
+      const json = JSON.stringify(extractedData, null, 2);
+      downloadFile(json, "EXITDATA_EXIF_RESULT.json", "application/json");
+    }
+
+    function downloadFile(content, filename, type) {
+      const blob = new Blob([content], { type });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+    }
+
+    function formatResultText(data) {
+      let text = "==============================\n";
+      text += " EXITDATA // EXIF EXTRACTOR PRO\n";
+      text += "==============================\n\n";
+
+      const keys = Object.keys(data).sort();
+
+      keys.forEach(key => {
+        text += `[${key}] : ${data[key]}\n`;
+      });
+
+      text += "\n==============================\n";
+      text += " END OF REPORT\n";
+      text += "==============================\n";
+
+      return text;
+    }
+
+    function resetAll() {
+      fileInput.value = "";
+      resetUI();
+      previewBox.style.display = "none";
+      resultBox.style.display = "none";
+      progress.style.display = "none";
+    }
+
+    function resetUI() {
+      warningBox.style.display = "none";
+      successBox.style.display = "none";
+      warningBox.innerHTML = "";
+      successBox.innerHTML = "";
+      progressBar.style.width = "0%";
+      exifTable.innerHTML = "";
+      extractedData = {};
+    }
+
+    // MATRIX BACKGROUND
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&@";
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+
+    const drops = [];
+    for (let x = 0; x < columns; x++) drops[x] = 1;
+
+    function drawMatrix() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#00ff99";
+      ctx.font = fontSize + "px Consolas";
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters[Math.floor(Math.random() * letters.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+
+    setInterval(drawMatrix, 50);
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
 </body>
 </html>
