@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EXITDATA</title>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Consolas, monospace; }
+
+    body {
+      background: #05070a;
+      color: #00ff99;
+      overflow-x: hidden;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0; left: 0;
+      z-index: -2;
+      width: 100%; height: 100%;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle, rgba(0,255,153,0.15), rgba(0,0,0,0.95));
+      z-index: -1;
+    }
+
+    header {
+      text-align: center;
+      padding: 30px 10px;
+      border-bottom: 1px solid rgba(0,255,153,0.2);
+    }
+
+    header h1 {
+      font-size: 2.1rem;
+      letter-spacing: 2px;
+      text-shadow: 0 0 12px rgba(0,255,153,0.7);
+    }
+
+    header p {
+      margin-top: 8px;
+      font-size: 0.95rem;
+      opacity: 0.8;
+    }
+
+    .container {
+      width: 95%;
+      max-width: 1150px;
+      margin: 30px auto;
+      padding: 20px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,255,153,0.2);
+      background: rgba(0,0,0,0.65);
+      box-shadow: 0 0 28px rgba(0,255,153,0.12);
+    }
+
+    .upload-box {
+      padding: 25px;
+      border: 1px dashed rgba(0,255,153,0.4);
+      border-radius: 14px;
+      text-align: center;
+    }
+
+    input[type="file"] { display: none; }
+
+    .btn {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 12px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      border: 1px solid rgba(0,255,153,0.6);
+      background: rgba(0,255,153,0.08);
+      color: #00ff99;
+      font-size: 0.95rem;
+      transition: 0.25s;
+    }
+
+    .btn:hover {
+      background: rgba(0,255,153,0.2);
+      box-shadow: 0 0 14px rgba(0,255,153,0.5);
+    }
+
+    .progress {
+      margin-top: 20px;
+      height: 10px;
+      width: 100%;
+      background: rgba(0,255,153,0.08);
+      border-radius: 8px;
+      overflow: hidden;
+      display: none;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #00ff99;
+      transition: 0.3s;
+    }
+
+    .status {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .warn {
+      border: 1px solid rgba(255,80,80,0.4);
+      background: rgba(255,80,80,0.08);
+      color: rgba(255,120,120,0.95);
+    }
+
+    .ok {
+      border: 1px solid rgba(0,255,153,0.4);
+      background: rgba(0,255,153,0.08);
+      color: rgba(0,255,153,0.95);
+    }
+
+    .preview {
+      margin-top: 25px;
+      text-align: center;
+      display: none;
+    }
+
+    .preview img {
+      max-width: 100%;
+      max-height: 320px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,255,153,0.25);
+      box-shadow: 0 0 20px rgba(0,255,153,0.12);
+    }
+
+    .report {
+      margin-top: 25px;
+      padding: 20px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,255,153,0.2);
+      background: rgba(0,0,0,0.55);
+      display: none;
+      overflow-x: auto;
+    }
+
+    .report h2 {
+      font-size: 1.15rem;
+      margin-bottom: 12px;
+      text-shadow: 0 0 8px rgba(0,255,153,0.6);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    td {
+      padding: 10px;
+      border-bottom: 1px solid rgba(0,255,153,0.14);
+      vertical-align: top;
+    }
+
+    td:first-child {
+      width: 35%;
+      opacity: 0.85;
+    }
+
+    .section-title {
+      margin-top: 20px;
+      margin-bottom: 10px;
+      font-size: 1rem;
+      opacity: 0.9;
+      border-left: 4px solid rgba(0,255,153,0.7);
+      padding-left: 10px;
+    }
+
+    .tools {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    iframe {
+      width: 100%;
+      height: 280px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,255,153,0.2);
+      margin-top: 12px;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      opacity: 0.6;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="matrix"></canvas>
+  <div class="overlay"></div>
+
+  <header>
+    <h1>EXITDATA</h1>
+    <p>NCODE</p>
+  </header>
+
+  <div class="container">
+    <div class="upload-box">
+      <h2>[UPLOAD IMAGE]</h2>
+      <p style="opacity:0.8;margin-top:8px;">
+        :)
+      </p>
+
+      <label class="btn" for="fileInput">SELECT IMAGE</label>
+      <input type="file" id="fileInput" accept="image/*"/>
+
+      <div class="progress" id="progress">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+
+      <div class="status warn" id="warnBox"></div>
+      <div class="status ok" id="okBox"></div>
+    </div>
+
+    <div class="preview" id="previewBox">
+      <h2 style="margin-bottom:15px;">[PREVIEW]</h2>
+      <img id="previewImage" src="" alt="Preview"/>
+    </div>
+
+    <div class="report" id="reportBox">
+      <h2>[OUTPUT]</h2>
+
+      <div class="section-title">SYSTEM INFO</div>
+      <table id="systemTable"></table>
+
+      <div class="section-title">FILE</div>
+      <table id="fileTable"></table>
+
+      <div class="section-title">DEVICE METADATA</div>
+      <table id="deviceTable"></table>
+
+      <div class="section-title">GPS</div>
+      <table id="gpsTable"></table>
+      <div id="mapBox"></div>
+
+      <div class="section-title">RAW EXIF DUMP (FULL)</div>
+      <table id="rawTable"></table>
+
+      <div class="tools">
+        <button class="btn" onclick="copyReport()">COPY REPORT</button>
+        <button class="btn" onclick="downloadTXT()">DOWNLOAD TXT</button>
+        <button class="btn" onclick="downloadJSON()">DOWNLOAD JSON</button>
+        <button class="btn" onclick="downloadHTML()">DOWNLOAD HTML REPORT</button>
+        <button class="btn" onclick="resetAll()">RESET</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    EXITDATA NCODE v2.0
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+
+  <script>
+    let extracted = {};
+    let reportText = "";
+
+    const fileInput = document.getElementById("fileInput");
+    const previewBox = document.getElementById("previewBox");
+    const previewImage = document.getElementById("previewImage");
+
+    const reportBox = document.getElementById("reportBox");
+
+    const systemTable = document.getElementById("systemTable");
+    const fileTable = document.getElementById("fileTable");
+    const deviceTable = document.getElementById("deviceTable");
+    const gpsTable = document.getElementById("gpsTable");
+    const rawTable = document.getElementById("rawTable");
+    const mapBox = document.getElementById("mapBox");
+
+    const warnBox = document.getElementById("warnBox");
+    const okBox = document.getElementById("okBox");
+
+    const progress = document.getElementById("progress");
+    const progressBar = document.getElementById("progressBar");
+
+    fileInput.addEventListener("change", async function() {
+      const file = this.files[0];
+      if (!file) return;
+
+      resetUI();
+      progress.style.display = "block";
+      progressBar.style.width = "15%";
+
+      previewImage.src = URL.createObjectURL(file);
+      previewBox.style.display = "block";
+
+      progressBar.style.width = "35%";
+
+      const fileBuffer = await file.arrayBuffer();
+
+      const md5Hash = await hashBuffer(fileBuffer, "MD5");
+      const sha256Hash = await hashBuffer(fileBuffer, "SHA-256");
+
+      progressBar.style.width = "55%";
+
+      EXIF.getData(previewImage, async function() {
+        const tags = EXIF.getAllTags(this);
+
+        extracted = tags || {};
+
+        progressBar.style.width = "70%";
+
+        buildSystemInfo();
+        buildFileInfo(file, md5Hash, sha256Hash);
+        buildDeviceInfo(extracted);
+        await buildGPSInfo(extracted);
+        buildRawDump(extracted);
+
+        progressBar.style.width = "100%";
+
+        if (!tags || Object.keys(tags).length === 0) {
+          warnBox.style.display = "block";
+          warnBox.innerHTML = "⚠ EXIF NOT FOUND. Image metadata may have been stripped by Instagram/WhatsApp compression.";
+        } else {
+          okBox.style.display = "block";
+          okBox.innerHTML = "✔ Extraction complete. Full forensic report generated.";
+        }
+
+        reportBox.style.display = "block";
+        generateTextReport(file, md5Hash, sha256Hash);
+      });
+    });
+
+    function buildSystemInfo() {
+      const reportID = "EXIT-" + Math.random().toString(36).substring(2, 10).toUpperCase();
+      const scanTime = new Date().toString();
+
+      const browser = navigator.userAgent;
+      const lang = navigator.language;
+      const platform = navigator.platform;
+
+      systemTable.innerHTML = `
+        <tr><td><b>Report ID</b></td><td>${reportID}</td></tr>
+        <tr><td><b>Scan Timestamp</b></td><td>${scanTime}</td></tr>
+        <tr><td><b>System Platform</b></td><td>${platform}</td></tr>
+        <tr><td><b>Browser Signature</b></td><td>${browser}</td></tr>
+        <tr><td><b>Language</b></td><td>${lang}</td></tr>
+        <tr><td><b>Scan Mode</b></td><td>...</td></tr>
+      `;
+    }
+
+    function buildFileInfo(file, md5Hash, sha256Hash) {
+      fileTable.innerHTML = `
+        <tr><td><b>File Name</b></td><td>${file.name}</td></tr>
+        <tr><td><b>File Type</b></td><td>${file.type || "Unknown"}</td></tr>
+        <tr><td><b>File Size</b></td><td>${(file.size/1024).toFixed(2)} KB</td></tr>
+        <tr><td><b>MD5 Hash</b></td><td>${md5Hash}</td></tr>
+        <tr><td><b>SHA-256 Hash</b></td><td>${sha256Hash}</td></tr>
+      `;
+    }
+
+    function buildDeviceInfo(tags) {
+      const make = tags.Make || "Not Found";
+      const model = tags.Model || "Not Found";
+      const software = tags.Software || "Not Found";
+      const dateTime = tags.DateTimeOriginal || tags.DateTime || "Not Found";
+      const lens = tags.LensModel || "Not Found";
+      const iso = tags.ISOSpeedRatings || "Not Found";
+      const exposure = tags.ExposureTime || "Not Found";
+      const aperture = tags.FNumber || "Not Found";
+      const focal = tags.FocalLength || "Not Found";
+      const flash = tags.Flash || "Not Found";
+      const whiteBalance = tags.WhiteBalance || "Not Found";
+
+      deviceTable.innerHTML = `
+        <tr><td><b>Camera Make</b></td><td>${make}</td></tr>
+        <tr><td><b>Camera Model</b></td><td>${model}</td></tr>
+        <tr><td><b>Software / OS</b></td><td>${software}</td></tr>
+        <tr><td><b>Lens Model</b></td><td>${lens}</td></tr>
+        <tr><td><b>Date Time Original</b></td><td>${dateTime}</td></tr>
+        <tr><td><b>ISO</b></td><td>${iso}</td></tr>
+        <tr><td><b>Exposure Time</b></td><td>${exposure}</td></tr>
+        <tr><td><b>Aperture (FNumber)</b></td><td>${aperture}</td></tr>
+        <tr><td><b>Focal Length</b></td><td>${focal}</td></tr>
+        <tr><td><b>Flash Used</b></td><td>${flash}</td></tr>
+        <tr><td><b>White Balance</b></td><td>${whiteBalance}</td></tr>
+      `;
+    }
+
+    async function buildGPSInfo(tags) {
+      gpsTable.innerHTML = "";
+      mapBox.innerHTML = "";
+
+      if (!tags.GPSLatitude || !tags.GPSLongitude) {
+        gpsTable.innerHTML = `
+          <tr><td><b>GPS Status</b></td><td>NOT FOUND</td></tr>
+          <tr><td><b>Reason</b></td><td>GPS metadata may be stripped by social media or disabled in camera settings.</td></tr>
+          <tr><td><b>Location Accuracy</b></td><td>UNAVAILABLE</td></tr>
+        `;
+        return;
+      }
+
+      const lat = convertDMSToDD(tags.GPSLatitude, tags.GPSLatitudeRef);
+      const lon = convertDMSToDD(tags.GPSLongitude, tags.GPSLongitudeRef);
+
+      const mapsLink = `https://www.google.com/maps?q=${lat},${lon}`;
+
+      let addressInfo = "Fetching address...";
+
+      // Reverse geocode (OpenStreetMap)
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+        const data = await res.json();
+        addressInfo = data.display_name || "Unknown Address";
+      } catch (e) {
+        addressInfo = "Reverse geocode failed (offline or blocked).";
+      }
+
+      gpsTable.innerHTML = `
+        <tr><td><b>GPS Status</b></td><td>FOUND</td></tr>
+        <tr><td><b>Latitude (Decimal)</b></td><td>${lat}</td></tr>
+        <tr><td><b>Longitude (Decimal)</b></td><td>${lon}</td></tr>
+        <tr><td><b>Google Maps Link</b></td><td><a href="${mapsLink}" target="_blank">OPEN MAP LOCATION</a></td></tr>
+        <tr><td><b>Estimated Address</b></td><td>${addressInfo}</td></tr>
+        <tr><td><b>Accuracy Note</b></td><td>GPS EXIF is usually accurate within 5-30 meters (depends on device).</td></tr>
+      `;
+
+      mapBox.innerHTML = `
+        <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=${lon-0.01}%2C${lat-0.01}%2C${lon+0.01}%2C${lat+0.01}&layer=mapnik&marker=${lat}%2C${lon}"></iframe>
+      `;
+    }
+
+    function buildRawDump(tags) {
+      rawTable.innerHTML = "";
+      const keys = Object.keys(tags).sort();
+
+      if (keys.length === 0) {
+        rawTable.innerHTML = `<tr><td><b>RAW EXIF</b></td><td>NO DATA</td></tr>`;
+        return;
+      }
+
+      keys.forEach(k => {
+        let v = tags[k];
+        if (typeof v === "object") v = JSON.stringify(v);
+        rawTable.innerHTML += `<tr><td><b>${k}</b></td><td>${v}</td></tr>`;
+      });
+    }
+
+    function convertDMSToDD(dms, ref) {
+      const degrees = dms[0].numerator / dms[0].denominator;
+      const minutes = dms[1].numerator / dms[1].denominator;
+      const seconds = dms[2].numerator / dms[2].denominator;
+
+      let dd = degrees + minutes / 60 + seconds / 3600;
+      if (ref === "S" || ref === "W") dd = dd * -1;
+      return dd.toFixed(6);
+    }
+
+    async function hashBuffer(buffer, algo) {
+      if (algo === "MD5") {
+        return "MD5 not supported by WebCrypto (use SHA-256).";
+      }
+
+      const hash = await crypto.subtle.digest("SHA-256", buffer);
+      return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    function generateTextReport(file, md5Hash, sha256Hash) {
+      reportText = "=========================================\n";
+      reportText += " EXITDATA // BY NCODE (v2.0)\n";
+      reportText += "=========================================\n\n";
+
+      reportText += "[SYSTEM INFO]\n";
+      reportText += "Scan Timestamp : " + new Date().toString() + "\n";
+      reportText += "User Agent     : " + navigator.userAgent + "\n";
+      reportText += "Platform       : " + navigator.platform + "\n";
+      reportText += "Language       : " + navigator.language + "\n\n";
+
+      reportText += "[FILE INFO]\n";
+      reportText += "File Name      : " + file.name + "\n";
+      reportText += "File Type      : " + (file.type || "Unknown") + "\n";
+      reportText += "File Size      : " + (file.size/1024).toFixed(2) + " KB\n";
+      reportText += "MD5 Hash       : " + md5Hash + "\n";
+      reportText += "SHA-256 Hash   : " + sha256Hash + "\n\n";
+
+      reportText += "[EXIF DATA]\n";
+      if (!extracted || Object.keys(extracted).length === 0) {
+        reportText += "EXIF STATUS    : NOT FOUND\n";
+      } else {
+        Object.keys(extracted).sort().forEach(k => {
+          reportText += k + " : " + extracted[k] + "\n";
+        });
+      }
+
+      reportText += "\n=========================================\n";
+      reportText += " END OF REPORT\n";
+      reportText += "=========================================\n";
+    }
+
+    function copyReport() {
+      navigator.clipboard.writeText(reportText);
+      alert("Report copied!");
+    }
+
+    function downloadTXT() {
+      downloadFile(reportText, "EXITDATA_FORENSIC_REPORT.txt", "text/plain");
+    }
+
+    function downloadJSON() {
+      const json = JSON.stringify(extracted, null, 2);
+      downloadFile(json, "EXITDATA_EXIF_RAW.json", "application/json");
+    }
+
+    function downloadHTML() {
+      const html = document.documentElement.outerHTML;
+      downloadFile(html, "EXITDATA_FORENSIC_REPORT.html", "text/html");
+    }
+
+    function downloadFile(content, filename, type) {
+      const blob = new Blob([content], { type });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+    }
+
+    function resetAll() {
+      fileInput.value = "";
+      resetUI();
+      previewBox.style.display = "none";
+      reportBox.style.display = "none";
+      progress.style.display = "none";
+    }
+
+    function resetUI() {
+      warnBox.style.display = "none";
+      okBox.style.display = "none";
+      warnBox.innerHTML = "";
+      okBox.innerHTML = "";
+      progressBar.style.width = "0%";
+      systemTable.innerHTML = "";
+      fileTable.innerHTML = "";
+      deviceTable.innerHTML = "";
+      gpsTable.innerHTML = "";
+      rawTable.innerHTML = "";
+      mapBox.innerHTML = "";
+      extracted = {};
+      reportText = "";
+    }
+
+    // MATRIX EFFECT
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&@";
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+    const drops = Array(Math.floor(columns)).fill(1);
+
+    function drawMatrix() {
+      ctx.fillStyle = "rgba(0,0,0,0.08)";
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = "#00ff99";
+      ctx.font = fontSize + "px Consolas";
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters[Math.floor(Math.random() * letters.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+
+    setInterval(drawMatrix, 50);
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
