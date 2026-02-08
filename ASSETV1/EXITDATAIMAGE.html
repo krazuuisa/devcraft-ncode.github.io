@@ -6,26 +6,17 @@
   <title>EXITDATA</title>
 
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Consolas, monospace; }
+    * { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+      font-family: Consolas, monospace; 
+    }
 
     body {
-      background: #05070a;
+      background: #000;
       color: #00ff99;
       overflow-x: hidden;
-    }
-
-    canvas {
-      position: fixed;
-      top: 0; left: 0;
-      z-index: -2;
-      width: 100%; height: 100%;
-    }
-
-    .overlay {
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(circle, rgba(0,255,153,0.15), rgba(0,0,0,0.95));
-      z-index: -1;
     }
 
     header {
@@ -53,8 +44,8 @@
       padding: 20px;
       border-radius: 14px;
       border: 1px solid rgba(0,255,153,0.2);
-      background: rgba(0,0,0,0.65);
-      box-shadow: 0 0 28px rgba(0,255,153,0.12);
+      background: rgba(15,15,15,0.95);
+      box-shadow: 0 0 20px rgba(0,255,153,0.10);
     }
 
     .upload-box {
@@ -73,22 +64,22 @@
       border-radius: 10px;
       cursor: pointer;
       border: 1px solid rgba(0,255,153,0.6);
-      background: rgba(0,255,153,0.08);
+      background: transparent;
       color: #00ff99;
       font-size: 0.95rem;
       transition: 0.25s;
     }
 
     .btn:hover {
-      background: rgba(0,255,153,0.2);
-      box-shadow: 0 0 14px rgba(0,255,153,0.5);
+      background: rgba(0,255,153,0.15);
+      box-shadow: 0 0 14px rgba(0,255,153,0.4);
     }
 
     .progress {
       margin-top: 20px;
       height: 10px;
       width: 100%;
-      background: #0000;
+      background: rgba(0,255,153,0.1);
       border-radius: 8px;
       overflow: hidden;
       display: none;
@@ -97,7 +88,7 @@
     .progress-bar {
       height: 100%;
       width: 0%;
-      background: #0000;
+      background: #00ff99;
       transition: 0.3s;
     }
 
@@ -111,13 +102,13 @@
 
     .warn {
       border: 1px solid rgba(255,80,80,0.4);
-      background: #0000;
+      background: rgba(255,80,80,0.08);
       color: rgba(255,120,120,0.95);
     }
 
     .ok {
       border: 1px solid rgba(0,255,153,0.4);
-      background: #0000;
+      background: rgba(0,255,153,0.08);
       color: rgba(0,255,153,0.95);
     }
 
@@ -140,7 +131,7 @@
       padding: 20px;
       border-radius: 14px;
       border: 1px solid rgba(0,255,153,0.2);
-      background: rgba(0,0,0,0.55);
+      background: rgba(10,10,10,0.95);
       display: none;
       overflow-x: auto;
     }
@@ -202,8 +193,6 @@
 </head>
 
 <body>
-  <canvas id="matrix"></canvas>
-  <div class="overlay"></div>
 
   <header>
     <h1>EXITDATA</h1>
@@ -213,9 +202,7 @@
   <div class="container">
     <div class="upload-box">
       <h2>[UPLOAD IMAGE]</h2>
-      <p style="opacity:0.8;margin-top:8px;">
-        :)
-      </p>
+      <p style="opacity:0.8;margin-top:8px;">Upload image untuk membaca EXIF metadata.</p>
 
       <label class="btn" for="fileInput">SELECT IMAGE</label>
       <input type="file" id="fileInput" accept="image/*"/>
@@ -306,20 +293,18 @@
 
       const fileBuffer = await file.arrayBuffer();
 
-      const md5Hash = await hashBuffer(fileBuffer, "MD5");
-      const sha256Hash = await hashBuffer(fileBuffer, "SHA-256");
+      const sha256Hash = await hashBuffer(fileBuffer);
 
       progressBar.style.width = "55%";
 
       EXIF.getData(previewImage, async function() {
         const tags = EXIF.getAllTags(this);
-
         extracted = tags || {};
 
         progressBar.style.width = "70%";
 
         buildSystemInfo();
-        buildFileInfo(file, md5Hash, sha256Hash);
+        buildFileInfo(file, sha256Hash);
         buildDeviceInfo(extracted);
         await buildGPSInfo(extracted);
         buildRawDump(extracted);
@@ -328,14 +313,14 @@
 
         if (!tags || Object.keys(tags).length === 0) {
           warnBox.style.display = "block";
-          warnBox.innerHTML = "⚠ Tidak Ditemukan.";
+          warnBox.innerHTML = "⚠ Tidak ditemukan EXIF (mungkin sudah dihapus oleh IG/WA).";
         } else {
           okBox.style.display = "block";
-          okBox.innerHTML = "✔ Done ini hasilnya...";
+          okBox.innerHTML = "✔ Done, data berhasil diambil.";
         }
 
         reportBox.style.display = "block";
-        generateTextReport(file, md5Hash, sha256Hash);
+        generateTextReport(file, sha256Hash);
       });
     });
 
@@ -343,55 +328,34 @@
       const reportID = "EXIT-" + Math.random().toString(36).substring(2, 10).toUpperCase();
       const scanTime = new Date().toString();
 
-      const browser = navigator.userAgent;
-      const lang = navigator.language;
-      const platform = navigator.platform;
-
       systemTable.innerHTML = `
         <tr><td><b>Report ID</b></td><td>${reportID}</td></tr>
         <tr><td><b>Scan Timestamp</b></td><td>${scanTime}</td></tr>
-        <tr><td><b>System Platform</b></td><td>${platform}</td></tr>
-        <tr><td><b>Browser Signature</b></td><td>${browser}</td></tr>
-        <tr><td><b>Language</b></td><td>${lang}</td></tr>
-        <tr><td><b>Scan Mode</b></td><td>...</td></tr>
+        <tr><td><b>Platform</b></td><td>${navigator.platform}</td></tr>
+        <tr><td><b>User Agent</b></td><td>${navigator.userAgent}</td></tr>
+        <tr><td><b>Language</b></td><td>${navigator.language}</td></tr>
       `;
     }
 
-    function buildFileInfo(file, md5Hash, sha256Hash) {
+    function buildFileInfo(file, sha256Hash) {
       fileTable.innerHTML = `
         <tr><td><b>File Name</b></td><td>${file.name}</td></tr>
         <tr><td><b>File Type</b></td><td>${file.type || "Unknown"}</td></tr>
         <tr><td><b>File Size</b></td><td>${(file.size/1024).toFixed(2)} KB</td></tr>
-        <tr><td><b>MD5 Hash</b></td><td>${md5Hash}</td></tr>
         <tr><td><b>SHA-256 Hash</b></td><td>${sha256Hash}</td></tr>
       `;
     }
 
     function buildDeviceInfo(tags) {
-      const make = tags.Make || "Not Found";
-      const model = tags.Model || "Not Found";
-      const software = tags.Software || "Not Found";
-      const dateTime = tags.DateTimeOriginal || tags.DateTime || "Not Found";
-      const lens = tags.LensModel || "Not Found";
-      const iso = tags.ISOSpeedRatings || "Not Found";
-      const exposure = tags.ExposureTime || "Not Found";
-      const aperture = tags.FNumber || "Not Found";
-      const focal = tags.FocalLength || "Not Found";
-      const flash = tags.Flash || "Not Found";
-      const whiteBalance = tags.WhiteBalance || "Not Found";
-
       deviceTable.innerHTML = `
-        <tr><td><b>Camera Make</b></td><td>${make}</td></tr>
-        <tr><td><b>Camera Model</b></td><td>${model}</td></tr>
-        <tr><td><b>Software / OS</b></td><td>${software}</td></tr>
-        <tr><td><b>Lens Model</b></td><td>${lens}</td></tr>
-        <tr><td><b>Date Time Original</b></td><td>${dateTime}</td></tr>
-        <tr><td><b>ISO</b></td><td>${iso}</td></tr>
-        <tr><td><b>Exposure Time</b></td><td>${exposure}</td></tr>
-        <tr><td><b>Aperture (FNumber)</b></td><td>${aperture}</td></tr>
-        <tr><td><b>Focal Length</b></td><td>${focal}</td></tr>
-        <tr><td><b>Flash Used</b></td><td>${flash}</td></tr>
-        <tr><td><b>White Balance</b></td><td>${whiteBalance}</td></tr>
+        <tr><td><b>Camera Make</b></td><td>${tags.Make || "Not Found"}</td></tr>
+        <tr><td><b>Camera Model</b></td><td>${tags.Model || "Not Found"}</td></tr>
+        <tr><td><b>Software</b></td><td>${tags.Software || "Not Found"}</td></tr>
+        <tr><td><b>DateTime</b></td><td>${tags.DateTimeOriginal || tags.DateTime || "Not Found"}</td></tr>
+        <tr><td><b>ISO</b></td><td>${tags.ISOSpeedRatings || "Not Found"}</td></tr>
+        <tr><td><b>Exposure Time</b></td><td>${tags.ExposureTime || "Not Found"}</td></tr>
+        <tr><td><b>FNumber</b></td><td>${tags.FNumber || "Not Found"}</td></tr>
+        <tr><td><b>Focal Length</b></td><td>${tags.FocalLength || "Not Found"}</td></tr>
       `;
     }
 
@@ -401,9 +365,8 @@
 
       if (!tags.GPSLatitude || !tags.GPSLongitude) {
         gpsTable.innerHTML = `
-          <tr><td><b>GPS Status</b></td><td>NOT FOUND</td></tr>
-          <tr><td><b>Reason</b></td><td>GPS metadata may be stripped by social media or disabled in camera settings.</td></tr>
-          <tr><td><b>Location Accuracy</b></td><td>UNAVAILABLE</td></tr>
+          <tr><td><b>Status</b></td><td>NOT FOUND</td></tr>
+          <tr><td><b>Note</b></td><td>GPS metadata mungkin hilang karena Instagram/WhatsApp.</td></tr>
         `;
         return;
       }
@@ -415,22 +378,20 @@
 
       let addressInfo = "Fetching address...";
 
-      // Reverse geocode (OpenStreetMap)
       try {
         const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
         const data = await res.json();
         addressInfo = data.display_name || "Unknown Address";
       } catch (e) {
-        addressInfo = "Reverse geocode failed (offline or blocked).";
+        addressInfo = "Reverse geocode failed (offline).";
       }
 
       gpsTable.innerHTML = `
-        <tr><td><b>GPS Status</b></td><td>FOUND</td></tr>
-        <tr><td><b>Latitude (Decimal)</b></td><td>${lat}</td></tr>
-        <tr><td><b>Longitude (Decimal)</b></td><td>${lon}</td></tr>
-        <tr><td><b>Google Maps Link</b></td><td><a href="${mapsLink}" target="_blank">OPEN MAP LOCATION</a></td></tr>
-        <tr><td><b>Estimated Address</b></td><td>${addressInfo}</td></tr>
-        <tr><td><b>Accuracy Note</b></td><td>GPS EXIF is usually accurate within 5-30 meters (depends on device).</td></tr>
+        <tr><td><b>Status</b></td><td>FOUND</td></tr>
+        <tr><td><b>Latitude</b></td><td>${lat}</td></tr>
+        <tr><td><b>Longitude</b></td><td>${lon}</td></tr>
+        <tr><td><b>Address</b></td><td>${addressInfo}</td></tr>
+        <tr><td><b>Google Maps</b></td><td><a href="${mapsLink}" target="_blank">OPEN MAP</a></td></tr>
       `;
 
       mapBox.innerHTML = `
@@ -460,40 +421,34 @@
       const seconds = dms[2].numerator / dms[2].denominator;
 
       let dd = degrees + minutes / 60 + seconds / 3600;
-      if (ref === "S" || ref === "W") dd = dd * -1;
+      if (ref === "S" || ref === "W") dd *= -1;
       return dd.toFixed(6);
     }
 
-    async function hashBuffer(buffer, algo) {
-      if (algo === "MD5") {
-        return "MD5 not supported by WebCrypto (use SHA-256).";
-      }
-
+    async function hashBuffer(buffer) {
       const hash = await crypto.subtle.digest("SHA-256", buffer);
       return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2, "0")).join("");
     }
 
-    function generateTextReport(file, md5Hash, sha256Hash) {
+    function generateTextReport(file, sha256Hash) {
       reportText = "=========================================\n";
       reportText += " EXITDATA // BY NCODE (v2.0)\n";
       reportText += "=========================================\n\n";
 
       reportText += "[SYSTEM INFO]\n";
-      reportText += "Scan Timestamp : " + new Date().toString() + "\n";
-      reportText += "User Agent     : " + navigator.userAgent + "\n";
-      reportText += "Platform       : " + navigator.platform + "\n";
-      reportText += "Language       : " + navigator.language + "\n\n";
+      reportText += "Timestamp : " + new Date().toString() + "\n";
+      reportText += "Platform  : " + navigator.platform + "\n";
+      reportText += "Language  : " + navigator.language + "\n\n";
 
       reportText += "[FILE INFO]\n";
-      reportText += "File Name      : " + file.name + "\n";
-      reportText += "File Type      : " + (file.type || "Unknown") + "\n";
-      reportText += "File Size      : " + (file.size/1024).toFixed(2) + " KB\n";
-      reportText += "MD5 Hash       : " + md5Hash + "\n";
-      reportText += "SHA-256 Hash   : " + sha256Hash + "\n\n";
+      reportText += "Name      : " + file.name + "\n";
+      reportText += "Type      : " + (file.type || "Unknown") + "\n";
+      reportText += "Size      : " + (file.size/1024).toFixed(2) + " KB\n";
+      reportText += "SHA-256   : " + sha256Hash + "\n\n";
 
-      reportText += "[EXIF DATA]\n";
+      reportText += "[EXIF RAW DATA]\n";
       if (!extracted || Object.keys(extracted).length === 0) {
-        reportText += "EXIF STATUS    : NOT FOUND\n";
+        reportText += "STATUS : NOT FOUND\n";
       } else {
         Object.keys(extracted).sort().forEach(k => {
           reportText += k + " : " + extracted[k] + "\n";
@@ -507,21 +462,21 @@
 
     function copyReport() {
       navigator.clipboard.writeText(reportText);
-      alert("Report copied!");
+      alert("Copied!");
     }
 
     function downloadTXT() {
-      downloadFile(reportText, "EXITDATA_FORENSIC_REPORT.txt", "text/plain");
+      downloadFile(reportText, "EXITDATA_REPORT.txt", "text/plain");
     }
 
     function downloadJSON() {
       const json = JSON.stringify(extracted, null, 2);
-      downloadFile(json, "EXITDATA_EXIF_RAW.json", "application/json");
+      downloadFile(json, "EXITDATA_RAW.json", "application/json");
     }
 
     function downloadHTML() {
       const html = document.documentElement.outerHTML;
-      downloadFile(html, "EXITDATA_FORENSIC_REPORT.html", "text/html");
+      downloadFile(html, "EXITDATA_REPORT.html", "text/html");
     }
 
     function downloadFile(content, filename, type) {
@@ -546,50 +501,17 @@
       warnBox.innerHTML = "";
       okBox.innerHTML = "";
       progressBar.style.width = "0%";
+
       systemTable.innerHTML = "";
       fileTable.innerHTML = "";
       deviceTable.innerHTML = "";
       gpsTable.innerHTML = "";
       rawTable.innerHTML = "";
       mapBox.innerHTML = "";
+
       extracted = {};
       reportText = "";
     }
-
-    // MATRIX EFFECT
-    const canvas = document.getElementById("matrix");
-    const ctx = canvas.getContext("2d");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&@";
-    const fontSize = 16;
-    const columns = canvas.width / fontSize;
-    const drops = Array(Math.floor(columns)).fill(1);
-
-    function drawMatrix() {
-      ctx.fillStyle = "rgba(0,0,0,0.08)";
-      ctx.fillRect(0,0,canvas.width,canvas.height);
-      ctx.fillStyle = "#00ff99";
-      ctx.font = fontSize + "px Consolas";
-
-      for (let i = 0; i < drops.length; i++) {
-        const text = letters[Math.floor(Math.random() * letters.length)];
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-        drops[i]++;
-      }
-    }
-
-    setInterval(drawMatrix, 50);
-
-    window.addEventListener("resize", () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    });
   </script>
 </body>
-</html>
+</html
