@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DevCraft NCode</title>
+    <style>
+      :root{
+        --bg:#04070d;
+        --bg2:#0b1220;
+        --panel: rgba(12,16,25,0.72);
+        --panel2: rgba(17,22,32,0.9);
+        --text:#eef6ff;
+        --muted:#9ca9c7;
+        --line: rgba(255,255,255,0.08);
+        --violet:#8b5cf6;
+        --cyan:#38bdf8;
+        --mint:#2dd4bf;
+        --pink:#f472b6;
+      }
+
+      *{ box-sizing:border-box; }
+      html{ scroll-behavior:smooth; }
+      body{
+        margin:0;
+        font-family: Inter, "Segoe UI", sans-serif;
+        color:var(--text);
+        background:
+          radial-gradient(circle at 20% 20%, rgba(139,92,246,0.24), transparent 18%),
+          radial-gradient(circle at 80% 10%, rgba(56,189,248,0.16), transparent 20%),
+          radial-gradient(circle at 50% 80%, rgba(45,212,191,0.15), transparent 26%),
+          linear-gradient(120deg, var(--bg), var(--bg2));
+        overflow-x:hidden;
+      }
+
+      a{ text-decoration:none; color:inherit; }
+      canvas{
+        position:fixed;
+        inset:0;
+        width:100%;
+        height:100%;
+        z-index:0;
+        opacity:1;
+      }
+
+      .page{
+        position:relative;
+        z-index:1;
+        width:min(1200px, calc(100% - 20px));
+        margin:0 auto;
+        padding:18px 0 60px;
+      }
+
+      .nav{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        padding:14px 16px;
+        border:1px solid var(--line);
+        background:rgba(14,18,26,0.38);
+        backdrop-filter: blur(14px);
+        border-radius:18px;
+        position:sticky;
+        top:12px;
+        z-index:50;
+        box-shadow:0 8px 24px rgba(0,0,0,0.22);
+      }
+
+      .brand{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        font-weight:800;
+        letter-spacing:0.08em;
+        font-size:0.86rem;
+        text-transform:uppercase;
+      }
+
+      .logo{
+        width:30px; height:30px;
+        border-radius:10px;
+        display:grid; place-items:center;
+        background:linear-gradient(135deg, var(--violet), var(--cyan));
+        box-shadow:0 10px 26px rgba(139,92,246,0.45);
+        font-size:0.72rem;
+        font-weight:900;
+      }
+
+      .menu{
+        display:flex;
+        align-items:center;
+        gap:16px;
+        color:var(--muted);
+        font-size:0.78rem;
+      }
+
+      .menu a{ opacity:0.8; }
+      .menu a:hover{ opacity:1; color:var(--text); }
+
+      .menu .cta{
+        padding:10px 14px;
+        border-radius:12px;
+        border:1px solid rgba(255,255,255,0.08);
+        background:linear-gradient(135deg, rgba(139,92,246,0.18), rgba(56,189,248,0.12));
+        color:var(--text);
+        font-weight:700;
+      }
+
+      .hero{
+        position:relative;
+        padding:52px 0 12px;
+        min-height:640px;
+        display:grid;
+        place-items:center;
+      }
+
+      .hero-inner{
+        width:100%;
+        text-align:center;
+        position:relative;
+      }
+
+      .badge{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        padding:8px 14px;
+        border:1px solid rgba(139,92,246,0.28);
+        border-radius:999px;
+        background:rgba(139,92,246,0.08);
+        color:#ddd7ff;
+        font-size:0.7rem;
+        font-weight:800;
+        letter-spacing:0.14em;
+        text-transform:uppercase;
+      }
+
+      h1{
+        margin:18px auto 16px;
+        font-size:clamp(3.3rem, 10vw, 10rem);
+        line-height:0.82;
+        letter-spacing:-0.08em;
+        font-weight:900;
+        text-transform:uppercase;
+        max-width:1000px;
+      }
+
+      .gradient-text{
+        background:linear-gradient(135deg, #f7f7ff 0%, #c4b5fd 15%, #8b5cf6 38%, #38bdf8 70%, #2dd4bf 100%);
+        -webkit-background-clip:text;
+        background-clip:text;
+        color:transparent;
+      }
+
+      .sub{
+        max-width:680px;
+        margin:0 auto;
+        color:var(--muted);
+        font-size:0.96rem;
+        line-height:1.8;
+      }
+
+      .cta-row{
+        display:flex;
+        justify-content:center;
+        gap:12px;
+        margin-top:26px;
+        flex-wrap:wrap;
+      }
+
+      .btn{
+        min-width:170px;
+        min-height:52px;
+        padding:0 24px;
+        border-radius:14px;
+        border:1px solid rgba(255,255,255,0.08);
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        font-weight:800;
+        transition:0.25s ease;
+      }
+
+      .btn.primary{
+        background:linear-gradient(135deg, var(--violet), var(--cyan));
+        box-shadow:0 18px 36px rgba(56,189,248,0.18);
+      }
+
+      .btn.secondary{
+        background:rgba(255,255,255,0.02);
+      }
+
+      .btn:hover{
+        transform:translateY(-2px);
+        box-shadow:0 18px 30px rgba(59,130,246,0.18);
+      }
+
+      .feature-badges{
+        margin-top:30px;
+        display:flex;
+        justify-content:center;
+        gap:12px;
+        flex-wrap:wrap;
+      }
+
+      .feature-badges span{
+        padding:10px 12px;
+        border-radius:999px;
+        border:1px solid var(--line);
+        background:rgba(255,255,255,0.02);
+        color:#e4ebff;
+        font-size:0.7rem;
+        letter-spacing:0.08em;
+        text-transform:uppercase;
+        font-weight:700;
+      }
+
+      .glass-stack{
+        position:relative;
+        margin-top:44px;
+        display:grid;
+        grid-template-columns:repeat(3, minmax(0, 1fr));
+        gap:18px;
+      }
+
+      .panel{
+        position:relative;
+        overflow:hidden;
+        padding:22px 18px;
+        border-radius:22px;
+        background:linear-gradient(180deg, rgba(15,20,30,0.75), rgba(9,14,21,0.96));
+        border:1px solid rgba(255,255,255,0.08);
+        box-shadow:0 20px 46px rgba(0,0,0,0.22);
+      }
+
+      .panel::before{
+        content:"";
+        position:absolute;
+        inset:-20% auto auto -10%;
+        width:160px; height:160px;
+        border-radius:50%;
+        background:radial-gradient(circle, rgba(139,92,246,0.28), transparent 68%);
+        filter: blur(8px);
+      }
+
+      .panel::after{
+        content:"";
+        position:absolute;
+        right:-18%; bottom:-20%;
+        width:160px; height:160px;
+        border-radius:50%;
+        background:radial-gradient(circle, rgba(56,189,248,0.2), transparent 68%);
+        filter: blur(8px);
+      }
+
+      .panel .num{
+        display:block;
+        font-size:2rem;
+        font-weight:900;
+        letter-spacing:-0.05em;
+        margin-bottom:10px;
+      }
+
+      .panel .label{
+        color:var(--muted);
+        font-size:0.75rem;
+        text-transform:uppercase;
+        letter-spacing:0.12em;
+      }
+
+      .panel .bar{
+        margin-top:16px;
+        width:100%;
+        height:8px;
+        border-radius:999px;
+        background:rgba(255,255,255,0.06);
+        overflow:hidden;
+      }
+
+      .panel .bar > i{
+        display:block;
+        height:100%;
+        border-radius:inherit;
+        background:linear-gradient(90deg, var(--violet), var(--cyan), var(--mint));
+      }
+
+      .section{
+        padding-top:22px;
+      }
+
+      .tool-grid{
+        display:grid;
+        grid-template-columns:repeat(3, minmax(0, 1fr));
+        gap:18px;
+        margin-top:28px;
+      }
+
+      .tool{
+        position:relative;
+        overflow:hidden;
+        padding:22px 18px 18px;
+        background:rgba(15,21,30,0.64);
+        border:1px solid var(--line);
+        border-radius:22px;
+        box-shadow:0 18px 40px rgba(0,0,0,0.12);
+        transition:0.25s ease;
+      }
+
+      .tool:hover{
+        transform:translateY(-6px);
+        border-color: rgba(139,92,246,0.38);
+      }
+
+      .tool .icon{
+        width:48px; height:48px;
+        border-radius:14px;
+        display:grid; place-items:center;
+        font-size:1.3rem;
+        background:linear-gradient(135deg, rgba(139,92,246,0.2), rgba(56,189,248,0.12));
+        border:1px solid rgba(255,255,255,0.08);
+        margin-bottom:14px;
+      }
+
+      .tool h3{
+        margin:0 0 8px;
+        font-size:1.08rem;
+        font-weight:800;
+      }
+
+      .tool p{
+        margin:0;
+        color:var(--muted);
+        line-height:1.7;
+        font-size:0.9rem;
+      }
+
+      .tags{
+        display:flex;
+        gap:8px;
+        flex-wrap:wrap;
+        margin-top:16px;
+      }
+
+      .tags span{
+        font-size:0.62rem;
+        font-weight:700;
+        letter-spacing:0.08em;
+        text-transform:uppercase;
+        padding:7px 9px;
+        border-radius:999px;
+        border:1px solid rgba(255,255,255,0.07);
+        background:rgba(255,255,255,0.02);
+      }
+
+      .footer{
+        padding:24px 0 8px;
+        text-align:center;
+        color:var(--muted);
+        font-size:0.8rem;
+      }
+
+      @media (max-width: 900px){
+        .glass-stack, .tool-grid{
+          grid-template-columns:repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 680px){
+        .menu a{ display:none; }
+        .hero{ min-height:auto; padding-top:38px; }
+        .glass-stack, .tool-grid{
+          grid-template-columns:1fr;
+        }
+        .btn{
+          width:100%;
+        }
+        .cta-row{
+          flex-direction:column;
+        }
+        .nav{
+          padding:12px 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="particles"></canvas>
+
+    <div class="page">
+      <nav class="nav">
+        <div class="brand">
+          <div class="logo">DC</div>
+          <span>DevCraft</span>
+        </div>
+
+        <div class="menu">
+          <a href="#">Home</a>
+          <a href="#">Tools</a>
+          <a href="#">Studio</a>
+          <a href="#" class="cta">Launch</a>
+        </div>
+      </nav>
+
+      <header class="hero">
+        <div class="hero-inner">
+          <div class="badge">Creative digital lab</div>
+          <h1>
+            <span class="gradient-text">NCode</span>
+          </h1>
+          <p class="sub">
+            Built for speed, clarity, and modern digital workflows.
+          </p>
+
+          <div class="cta-row">
+            <a href="#" class="btn primary">Explore</a>
+            <a href="#" class="btn secondary">Demo</a>
+          </div>
+
+          <div class="feature-badges">
+            <span>Fast</span>
+            <span>Minimal</span>
+            <span>Smart</span>
+            <span>Modern</span>
+          </div>
+
+          <div class="glass-stack">
+            <div class="panel">
+              <span class="num">12+</span>
+              <div class="label">Tools</div>
+              <div class="bar"><i style="width:90%"></i></div>
+            </div>
+
+            <div class="panel">
+              <span class="num">24/7</span>
+              <div class="label">Access</div>
+              <div class="bar"><i style="width:76%"></i></div>
+            </div>
+
+            <div class="panel">
+              <span class="num">99.9</span>
+              <div class="label">Focus</div>
+              <div class="bar"><i style="width:94%"></i></div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section class="section">
+        <div class="tool-grid">
+          <article class="tool">
+            <div class="icon">🔍</div>
+            <h3>DNS</h3>
+            <p>Check records and map the flow of your digital presence.</p>
+            <div class="tags">
+              <span>DNS</span>
+              <span>Cloud</span>
+            </div>
+          </article>
+
+          <article class="tool">
+            <div class="icon">🧩</div>
+            <h3>Email</h3>
+            <p>Scan for exposure and keep your footprint safer.</p>
+            <div class="tags">
+              <span>Security</span>
+              <span>Audit</span>
+            </div>
+          </article>
+
+          <article class="tool">
+            <div class="icon">🌍</div>
+            <h3>Geo</h3>
+            <p>Visualize coordinates and understand location-based data.</p>
+            <div class="tags">
+              <span>Map</span>
+              <span>Info</span>
+            </div>
+          </article>
+
+          <article class="tool">
+            <div class="icon">📸</div>
+            <h3>Exif</h3>
+            <p>Read metadata quietly and identify hidden details fast.</p>
+            <div class="tags">
+              <span>Image</span>
+              <span>Meta</span>
+            </div>
+          </article>
+
+          <article class="tool">
+            <div class="icon">🛡️</div>
+            <h3>Threat</h3>
+            <p>Highlight suspicious strings before they become problems.</p>
+            <div class="tags">
+              <span>Scan</span>
+              <span>Risk</span>
+            </div>
+          </article>
+
+          <article class="tool">
+            <div class="icon">💻</div>
+            <h3>ASCII</h3>
+            <p>Create stylized text and design artifacts with minimal friction.</p>
+            <div class="tags">
+              <span>Text</span>
+              <span>ASCII</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <div class="footer">© 2026 DevCraft NCode</div>
+    </div>
+
+    <script>
+      const canvas = document.getElementById("particles");
+      const ctx = canvas.getContext("2d");
+      let particles = [];
+      let mouse = { x: 0, y: 0, active: false };
+
+      function setupCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+
+      function createParticle() {
+        return {
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.8,
+          vy: (Math.random() - 0.5) * 0.8,
+          r: Math.random() * 1.8 + 1.2,
+          alpha: Math.random() * 0.8 + 0.25
+        };
+      }
+
+      function buildParticles() {
+        particles = [];
+        let count = window.innerWidth < 700 ? 70 : 140;
+        for (let i = 0; i < count; i++) particles.push(createParticle());
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+          if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+          if (mouse.active) {
+            const dx = p.x - mouse.x;
+            const dy = p.y - mouse.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 110) {
+              const force = (110 - dist) / 110;
+              p.x += (dx / dist) * force * 1.6;
+              p.y += (dy / dist) * force * 1.6;
+            }
+          }
+
+          ctx.beginPath();
+          ctx.fillStyle = `rgba(148, 163, 184, ${p.alpha})`;
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+
+          for (let j = i + 1; j < particles.length; j++) {
+            const q = particles[j];
+            const dx = p.x - q.x;
+            const dy = p.y - q.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 96) {
+              ctx.beginPath();
+              ctx.strokeStyle = `rgba(148, 163, 184, ${0.2 - dist / 650})`;
+              ctx.lineWidth = 1;
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(q.x, q.y);
+              ctx.stroke();
+            }
+          }
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      setupCanvas();
+      buildParticles();
+      animate();
+
+      window.addEventListener("resize", () => {
+        setupCanvas();
+        buildParticles();
+      });
+
+      window.addEventListener("pointermove", (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+        mouse.active = true;
+      });
+
+      window.addEventListener("pointerleave", () => {
+        mouse.active = false;
+      });
+    </script>
+  </body>
+</html>
