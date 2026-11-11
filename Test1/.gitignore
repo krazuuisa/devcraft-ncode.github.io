@@ -1,0 +1,25 @@
+# secrets
+.env
+.env.*
+!.env.example
+
+# logs & cache
+logs/
+__pycache__/
+*.pyc
+*.pyo
+*.log
+
+# virtualenv
+.venv/
+venv/
+env/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
