@@ -1,0 +1,5 @@
+{
+  "version": "1.0",
+  "developer": "NCODE",
+  "external_ip_check": "api.ipify.org"
+}
